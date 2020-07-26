@@ -18,12 +18,9 @@ export class Game extends Component {
 	canvas
 
 	componentDidMount () {
-		const { storageUpdate, storage } = this.props
+		const { storageUpdate } = this.props
 		document.body.style.overflow = 'hidden'
 		storageUpdate({ extraWords: [], hasWords: false })
-		if (!storage.wasInGame) {
-			storageUpdate({ activeModal: 'tutorial-modal-1', stop: true })
-		}
 	}
 
 	componentWillUnmount () {

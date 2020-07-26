@@ -21,9 +21,9 @@ const INITIAL_STORAGE = {
   opponent: undefined,
   connected: false,
   refreshing: false,
-  wasInGame: false,
   activeModal: null,
   hasWords: false,
+  theme: 'light',
   slideIndex: 0,
   extraWords: []
 }

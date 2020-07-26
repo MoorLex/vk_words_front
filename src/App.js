@@ -16,6 +16,7 @@ import Main from './panels/Main'
 import Game from './panels/Game'
 import Loading from './panels/Loading'
 import Error403 from './panels/Error_403'
+import Launch from './panels/Launch'
 import ErrorDisconnect from './panels/Error_Disconnect'
 import IconFavoriteOutline from '@vkontakte/icons/dist/56/favorite_outline'
 
@@ -30,14 +31,18 @@ export class App extends Component{
 	}
 
 	componentDidMount() {
+		const { storageUpdate } = this.props
 		bridge.send("VKWebAppInit").then(() => {})
 		bridge.subscribe(({ detail: { type, data }}) => {
 			if (type === 'VKWebAppUpdateConfig') {
+				storageUpdate({ theme: data.scheme === 'client_light' ? 'light' : 'dark' })
 				const schemeAttribute = document.createAttribute('scheme');
 				schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
 				document.body.attributes.setNamedItem(schemeAttribute);
 			}
 		})
+
+		// document.body.setAttribute('scheme', 'space_gray');
 	}
 
 	navigate = (activePanel) => {
@@ -88,6 +93,8 @@ export class App extends Component{
 								 navigate={this.navigate}
 								 finish={this.finish}
 								 loading={this.loading} />
+				<Launch id="launch"
+								navigate={this.navigate} />
 				<Main id="main"
 							navigate={this.navigate}
 							loading={this.loading} />

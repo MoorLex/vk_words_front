@@ -13,7 +13,6 @@ import {
   Div
 } from '@vkontakte/vkui'
 import vkQr from '@vkontakte/vk-qr';
-import IconServicesOutline from '@vkontakte/icons/dist/56/services_outline'
 import IconDismiss from '@vkontakte/icons/dist/24/dismiss'
 import { actions } from '../store'
 
@@ -40,9 +39,14 @@ export class Modals extends Component {
   }
 
   ModalInvite () {
-    const {  user } = this.props
+    const { user } = this.props
+    const foregroundColor = getComputedStyle(document.documentElement)
+      .getPropertyValue('--placeholder_icon_foreground_secondary')
     const qrSvg = vkQr.createQR('https://vk.com/app7500339/#' + user.socket, {
+      ecc: 2,
       qrSize: 256,
+      logoColor: '#6358b8',
+      foregroundColor,
       isShowLogo: true
     });
 
@@ -52,10 +56,10 @@ export class Modals extends Component {
     return (
       <ModalCard id="modal-invite"
                  onClose={() => this.onHide()}
-                 icon={<Avatar size={150}
+                 icon={<Avatar size={200}
                                mode="image"
                                shadow={false}
-                               style={{ background: 'var(--white)' }}
+                               style={{ background: 'transparent' }}
                                src={`data:image/svg+xml;base64,${base64data}`} />}
                  header="Играйте вместе!"
                  caption="Попросите друга отсканировать QR код"
@@ -65,30 +69,6 @@ export class Modals extends Component {
                    action: () => {
                      bridge.send("VKWebAppShare", {"link": 'https://vk.com/app7500339/#' + user.socket});
                    }
-                 }]}
-                 actionsLayout="vertical" />
-    )
-  }
-
-  ModalTutorial1 () {
-    const { storageUpdate } = this.props
-    const close = () => {
-      storageUpdate({
-        stop: false,
-        activeModal: null,
-        wasInGame: true
-      })
-    }
-    return (
-      <ModalCard id="tutorial-modal-1"
-                 onClose={() => close()}
-                 icon={<IconServicesOutline />}
-                 header="Добро пожаловать в игру!"
-                 caption="Цель игры – заполнить все пустые поля уровня, собирая слова из доступных Вам букв"
-                 actions={[{
-                   title: 'Продолжить',
-                   mode: 'primary',
-                   action: () => close()
                  }]}
                  actionsLayout="vertical" />
     )
@@ -126,7 +106,6 @@ export class Modals extends Component {
     return (
       <ModalRoot activeModal={activeModal}
                  onClose={() => this.onClose()}>
-        {this.ModalTutorial1()}
         {this.ModalWords()}
         {this.ModalInvite()}
       </ModalRoot>

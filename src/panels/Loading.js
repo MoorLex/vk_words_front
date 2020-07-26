@@ -16,13 +16,12 @@ export class Loading extends Component {
 		const { storageUpdate, userUpdate, navigate, finish } = this.props
 
 		finish(false)
+		navigate('launch')
 
 		bridge.send("VKWebAppGetUserInfo").then((data) => {
 			userUpdate(data)
 			socket.emit('core/init', { ...data, params: window.location.href.split('?')[1].split('#')[0] })
 		})
-
-		// document.body.setAttribute('scheme', 'space_gray');
 
 		socket.on('connect', () => {
 			console.log('Connected!')
@@ -33,12 +32,12 @@ export class Loading extends Component {
 				socket: data.socket,
 				connected: true
 			})
-			storageUpdate({ wasInGame: !data.new, connected: true })
+			storageUpdate({ connected: true })
 			setTimeout(() => {
 				if (window.location.href.split('#')[1]) {
 					socket.emit('core/join', window.location.href.split('#')[1])
 				} else {
-					navigate('main')
+					navigate(data.new ? 'launch' : 'main')
 				}
 			}, 500)
 		})
@@ -69,6 +68,10 @@ export class Loading extends Component {
 
 		socket.on('core/error', (data) => {
 			console.warn(data)
+			if (window.location.href.split('#')[0]) {
+				window.history.pushState("", document.title, window.location.href.split('#')[0]);
+			}
+			storageUpdate({ activeModal: null, stop: false, opponent: undefined })
 			if (data.code === 403) {
 				navigate('error_403')
 			}
