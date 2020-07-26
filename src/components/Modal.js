@@ -58,7 +58,7 @@ export class Modals extends Component {
                                style={{ background: 'var(--white)' }}
                                src={`data:image/svg+xml;base64,${base64data}`} />}
                  header="Играйте вместе!"
-                 caption={'https://vk.com/app7500339/#' + user.socket}
+                 caption="Попросите друга отсканировать QR код"
                  actions={[{
                    title: 'Поделиться ссылкой',
                    mode: 'primary',
