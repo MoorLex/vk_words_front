@@ -3,11 +3,13 @@ import { connect } from 'react-redux'
 import bridge from '@vkontakte/vk-bridge'
 import {
 	View,
+	Alert,
 	ScreenSpinner
 } from '@vkontakte/vkui'
 import '@vkontakte/vkui/dist/vkui.css'
 import { socket } from './server'
 import { actions } from './store'
+import { game } from './game'
 import Modals from './components/Modal'
 
 import Main from './panels/Main'
@@ -15,6 +17,7 @@ import Game from './panels/Game'
 import Loading from './panels/Loading'
 import Error403 from './panels/Error_403'
 import ErrorDisconnect from './panels/Error_Disconnect'
+import IconFavoriteOutline from '@vkontakte/icons/dist/56/favorite_outline'
 
 export class App extends Component{
 	constructor(props) {
@@ -27,8 +30,6 @@ export class App extends Component{
 	}
 
 	componentDidMount() {
-		const { storageUpdate } = this.props
-
 		bridge.send("VKWebAppInit").then(() => {})
 		bridge.subscribe(({ detail: { type, data }}) => {
 			if (type === 'VKWebAppUpdateConfig') {
@@ -36,10 +37,6 @@ export class App extends Component{
 				schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
 				document.body.attributes.setNamedItem(schemeAttribute);
 			}
-		})
-		bridge.send('VKWebAppStorageGet', { keys: ['was_in_game'] }).then((data) => {
-			const wasInGame = data.keys.find(({ key }) => key === 'was_in_game')
-			storageUpdate({ wasInGame: wasInGame.value === 'true' })
 		})
 	}
 
@@ -51,10 +48,30 @@ export class App extends Component{
 		this.setState({ popout: isLoading ? <ScreenSpinner /> : null })
 	}
 
+	finish = (isFinish) => {
+		this.setState({ popout: isFinish ? (
+				<Alert onClose={() => {
+									this.finish(false)
+									this.navigate('main')
+								}}
+							 actions={[{
+								 title: 'Сыграть еще',
+								 action: () => this.reloadGame()
+							 }]} >
+					<div style={{ display: 'flex', justifyContent: 'center' }}>
+						<IconFavoriteOutline />
+					</div>
+					<h2>Вы нашли все слова!</h2>
+					<p>Хотите повторить игру?</p>
+				</Alert>
+			) : null })
+	}
+
 	async reloadGame () {
 		const { storageUpdate } = this.props
-		storageUpdate({ refreshing: true })
-		socket.emit('core/start')
+		storageUpdate({ refreshing: true, activeModal: null, stop: false, opponent: undefined })
+		const { words, words_length } = game
+		socket.emit('core/start', { words: words.length, wordsLength: words_length })
 	}
 
 	render () {
@@ -68,14 +85,16 @@ export class App extends Component{
 													 onReload={() => this.reloadGame()} />}
 						activePanel={activePanel}>
 				<Loading id="loading"
-								 navigate={this.navigate} />
+								 navigate={this.navigate}
+								 finish={this.finish}
+								 loading={this.loading} />
 				<Main id="main"
 							navigate={this.navigate}
 							loading={this.loading} />
 				<Game id="game"
 							navigate={this.navigate} />
 				<Error403 id="error_403"
-									 navigate={this.navigate} />
+									navigate={this.navigate} />
 				<ErrorDisconnect id="error_disconnect"
 												 navigate={this.navigate} />
 			</View>
