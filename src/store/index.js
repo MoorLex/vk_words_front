@@ -23,6 +23,7 @@ const INITIAL_STORAGE = {
   refreshing: false,
   wasInGame: false,
   activeModal: null,
+  hasWords: false,
   slideIndex: 0,
   extraWords: []
 }

@@ -151,7 +151,7 @@ export class Main extends Component {
 				</Gallery>
 				{storage.promo ? (
 					<PromoBanner bannerData={storage.promo}
-											 onClose={() => this.setState({ promoBannerProps: undefined })} />
+											 onClose={() => storageUpdate({ promo: undefined })} />
 				) : null}
 				{(players.length > 0) ? (
 					<Group>

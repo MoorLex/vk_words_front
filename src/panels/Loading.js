@@ -63,7 +63,7 @@ export class Loading extends Component {
 		})
 		socket.on('game/finish', (data) => {
 			userUpdate({ words: data.words })
-			storageUpdate({ stop: true })
+			storageUpdate({ stop: true, hasWords: false })
 			finish(true)
 		})
 

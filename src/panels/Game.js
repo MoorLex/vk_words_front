@@ -17,18 +17,10 @@ import { socket } from '../server'
 export class Game extends Component {
 	canvas
 
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			hasWords: false
-		}
-	}
-
 	componentDidMount () {
 		const { storageUpdate, storage } = this.props
 		document.body.style.overflow = 'hidden'
-		storageUpdate({ extraWords: [] })
+		storageUpdate({ extraWords: [], hasWords: false })
 		if (!storage.wasInGame) {
 			storageUpdate({ activeModal: 'tutorial-modal-1', stop: true })
 		}
@@ -71,8 +63,7 @@ export class Game extends Component {
 	}
 
 	render () {
-		const { hasWords } = this.state
-		const { storage } = this.props
+		const { storage, storageUpdate } = this.props
 
 		return (
 			<Panel id="game">
@@ -84,7 +75,7 @@ export class Game extends Component {
 									game={game}
 									stop={storage.stop}
 									findExtraWord={(word) => this.findExtraWord(word)}
-									findWord={() => this.setState({ hasWords: true })}
+									findWord={() => storageUpdate({ hasWords: true })}
 									onSubmit={(word) => this.onSubmit(word)} />
 				) : null}
 				<div style={{ ...styles.btn, right: '20px' }}
@@ -108,7 +99,7 @@ export class Game extends Component {
 						<span style={styles.btnOverlay}>{storage.extraWords.length}</span>
 					</Avatar>
 				</div>
-				{(hasWords ? false : !storage.opponent) ? (
+				{(storage.hasWords ? false : !storage.opponent) ? (
 					<div style={{ ...styles.btn, bottom: '70px', right: '20px' }}
 							 onClick={() => this.invite()}>
 						<Avatar style={{ background: 'var(--accent)' }}
