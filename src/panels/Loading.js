@@ -16,7 +16,6 @@ export class Loading extends Component {
 		const { storageUpdate, userUpdate, navigate, finish } = this.props
 
 		finish(false)
-		navigate('launch')
 
 		bridge.send("VKWebAppGetUserInfo").then((data) => {
 			userUpdate(data)

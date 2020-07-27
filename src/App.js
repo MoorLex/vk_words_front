@@ -35,7 +35,7 @@ export class App extends Component{
 		bridge.send("VKWebAppInit").then(() => {})
 		bridge.subscribe(({ detail: { type, data }}) => {
 			if (type === 'VKWebAppUpdateConfig') {
-				storageUpdate({ theme: data.scheme === 'client_light' ? 'light' : 'dark' })
+				storageUpdate({ theme: data.scheme === 'space_gray' ? 'dark' : 'light' })
 				const schemeAttribute = document.createAttribute('scheme');
 				schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
 				document.body.attributes.setNamedItem(schemeAttribute);

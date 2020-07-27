@@ -71,6 +71,7 @@ export class Game extends Component {
 					<Canvas ref={(ref) => this.canvas = ref}
 									game={game}
 									stop={storage.stop}
+									theme={storage.theme}
 									findExtraWord={(word) => this.findExtraWord(word)}
 									findWord={() => storageUpdate({ hasWords: true })}
 									onSubmit={(word) => this.onSubmit(word)} />

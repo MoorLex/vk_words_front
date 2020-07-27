@@ -120,7 +120,7 @@ export default class Canvas extends Component {
   drawGridLines () {
     const sketch = this.sketch
 
-    sketch.strokeWeight(4)
+    sketch.strokeWeight(6)
     this.gridLines.forEach(({ start, end, color }) => {
       sketch.stroke(color)
       sketch.line(start.x, start.y, end.x, end.y)
@@ -128,16 +128,18 @@ export default class Canvas extends Component {
   }
   drawGrid () {
     const sketch = this.sketch
+    const { theme } = this.props
+    const color = theme === 'light' ? '#F2F3F5' : '#454647'
 
     sketch.noStroke()
     sketch.rectMode(sketch.CORNER)
     sketch.textAlign(sketch.CENTER, sketch.CENTER)
     this.grid.forEach(({ char, x, y, size, isOpen, borderRadius, opacity, textSize }) => {
-      sketch.fill(230)
+      sketch.fill(color)
       sketch.rect(x, y, size, size, borderRadius)
       if (isOpen) {
         sketch.textSize(textSize)
-        sketch.fill(0, 0, 0, opacity)
+        sketch.fill(theme === 'light' ? 0 : 255, theme === 'light' ? 0 : 255, theme === 'light' ? 0 : 255, opacity)
         sketch.text(char.toUpperCase(), x + (size / 2), y + (size / 2) + (isSafari() ? 0 : 1))
       }
     })
