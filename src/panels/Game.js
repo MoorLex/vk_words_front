@@ -32,14 +32,36 @@ export class Game extends Component {
 		document.body.style.overflow = 'hidden'
 		storageUpdate({ extraWords: [], hasWords: false })
 
+		socket.on('opponent/joined', ({ name, socket }) => {
+			storageUpdate({ activeModal: null, stop: false, opponent: socket })
+			this.onUserJoined(name)
+		})
 		socket.on('opponent/disconnected', () => {
+			storageUpdate({ activeModal: null, stop: false, opponent: undefined })
 			this.onUserDisconnect()
 		})
 	}
 
 	componentWillUnmount () {
 		document.body.style.overflow = 'auto'
+		socket.removeAllListeners('opponent/joined')
 		socket.removeAllListeners('opponent/disconnected')
+	}
+
+	onUserJoined (name) {
+		if (this.state.snackbar) return;
+
+		setTimeout(() => {
+			this.setState({ snackbar:
+					<Snackbar layout="vertical"
+										onClose={() => this.setState({ snackbar: null })}
+										before={<Avatar size={24} style={{ backgroundColor: 'var(--accent)' }}>
+											<IconUser fill="#fff" width={14} height={14} />
+										</Avatar>}>
+						{name} подключился(-лась) к игре
+					</Snackbar>
+			});
+		}, 500)
 	}
 
 	onUserDisconnect () {

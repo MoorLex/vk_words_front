@@ -37,9 +37,6 @@ export class Loading extends Component {
 				}
 			}, 500)
 		})
-		socket.on('core/joined', (opponent) => {
-			storageUpdate({ activeModal: null, stop: false, opponent })
-		})
 
 		socket.on('game/start', (data) => {
 			const { loading } = this.props
@@ -59,7 +56,7 @@ export class Loading extends Component {
 		socket.on('game/finish', (data) => {
 			userUpdate({ words: data.words })
 			storageUpdate({ stop: true, hasWords: false })
-			finish(true)
+			finish(true, data)
 		})
 
 		socket.on('core/error', (data) => {

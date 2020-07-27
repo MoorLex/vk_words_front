@@ -19,6 +19,7 @@ import Error403 from './panels/Error_403'
 import Launch from './panels/Launch'
 import ErrorDisconnect from './panels/Error_Disconnect'
 import IconFavoriteOutline from '@vkontakte/icons/dist/56/favorite_outline'
+import IconUsersOutline from '@vkontakte/icons/dist/56/users_outline'
 
 export class App extends Component{
 	constructor(props) {
@@ -53,7 +54,7 @@ export class App extends Component{
 		this.setState({ popout: isLoading ? <ScreenSpinner /> : null })
 	}
 
-	finish = (isFinish) => {
+	finish = (isFinish, data = {}) => {
 		this.setState({ popout: isFinish ? (
 				<Alert onClose={() => {
 									this.finish(false)
@@ -64,9 +65,9 @@ export class App extends Component{
 								 action: () => this.reloadGame()
 							 }]} >
 					<div style={{ display: 'flex', justifyContent: 'center' }}>
-						<IconFavoriteOutline />
+						{data.win ? (<IconFavoriteOutline />) : (<IconUsersOutline />)}
 					</div>
-					<h2>Вы нашли все слова!</h2>
+					<h2>{data.win ? 'Вы нашли все слова!' : 'Ваш противник выйграл!'}</h2>
 					<p>Хотите повторить игру?</p>
 				</Alert>
 			) : null })
