@@ -22,9 +22,6 @@ export class Loading extends Component {
 			socket.emit('core/init', { ...data, params: window.location.href.split('?')[1].split('#')[0] })
 		})
 
-		socket.on('connect', () => {
-			console.log('Connected!')
-		})
 		socket.on('core/ready', async (data) => {
 			userUpdate({
 				words: data.words,
@@ -78,9 +75,6 @@ export class Loading extends Component {
 				navigate('main')
 			}
 			if (data.code === 405) {
-				navigate('main')
-			}
-			if (data.code === 420) {
 				navigate('main')
 			}
 			if (data.code === 422) {

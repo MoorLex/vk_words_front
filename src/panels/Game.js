@@ -4,11 +4,13 @@ import {
 	Panel,
 	PanelHeader,
 	PanelHeaderBack,
-	Avatar
+	Avatar,
+	Snackbar
 } from '@vkontakte/vkui'
 import IconRefreshOutline from '@vkontakte/icons/dist/28/refresh_outline'
 import IconWaterDropOutline from '@vkontakte/icons/dist/28/water_drop_outline'
 import IconUserAddOutline from '@vkontakte/icons/dist/28/user_add_outline'
+import IconUser from '@vkontakte/icons/dist/24/user'
 import Canvas from '../components/Canvas'
 import { game } from '../game'
 import { actions } from '../store'
@@ -17,14 +19,41 @@ import { socket } from '../server'
 export class Game extends Component {
 	canvas
 
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			snackbar: null
+		}
+	}
+
 	componentDidMount () {
 		const { storageUpdate } = this.props
 		document.body.style.overflow = 'hidden'
 		storageUpdate({ extraWords: [], hasWords: false })
+
+		socket.on('opponent/disconnected', () => {
+			this.onUserDisconnect()
+		})
 	}
 
 	componentWillUnmount () {
 		document.body.style.overflow = 'auto'
+		socket.removeAllListeners('opponent/disconnected')
+	}
+
+	onUserDisconnect () {
+		if (this.state.snackbar) return;
+
+		this.setState({ snackbar:
+				<Snackbar layout="vertical"
+									onClose={() => this.setState({ snackbar: null })}
+									before={<Avatar size={24} style={{ backgroundColor: 'var(--destructive)' }}>
+										<IconUser fill="#fff" width={14} height={14} />
+									</Avatar>}>
+					Ваш противник покинул игру
+				</Snackbar>
+		});
 	}
 
 	onRandomize () {
@@ -59,8 +88,60 @@ export class Game extends Component {
 		navigate("main")
 	}
 
+	BtnRandomize () {
+		return (
+			<div style={{ ...styles.btn, right: '20px' }}
+					 onClick={() => this.onRandomize()}>
+				<Avatar style={{ background: 'var(--accent)' }}
+								size={36}
+								shadow={false}>
+					<IconRefreshOutline width={28}
+															height={28}
+															fill="var(--white)" />
+				</Avatar>
+			</div>
+		)
+	}
+
+	BtnWords () {
+		const { storage } = this.props
+
+		return (
+			<div style={{ ...styles.btn, left: '20px' }}
+					 onClick={() => this.onShowWords()}>
+				<Avatar style={{ background: 'var(--accent)' }}
+								size={36}
+								shadow={false}>
+					<IconWaterDropOutline width={28}
+																height={28}
+																fill="var(--white)" />
+					<span style={styles.btnOverlay}>{storage.extraWords.length}</span>
+				</Avatar>
+			</div>
+		)
+	}
+
+	BtnInvite () {
+		const { storage } = this.props
+		if ((storage.hasWords ? true : storage.opponent)) return null
+
+		return (
+			<div style={{ ...styles.btn, bottom: '70px', right: '20px' }}
+					 onClick={() => this.invite()}>
+				<Avatar style={{ background: 'var(--accent)' }}
+								size={36}
+								shadow={false}>
+					<IconUserAddOutline width={24}
+															height={24}
+															fill="var(--white)" />
+				</Avatar>
+			</div>
+		)
+	}
+
 	render () {
 		const { storage, storageUpdate } = this.props
+		const { snackbar } = this.state
 
 		return (
 			<Panel id="game">
@@ -76,39 +157,10 @@ export class Game extends Component {
 									findWord={() => storageUpdate({ hasWords: true })}
 									onSubmit={(word) => this.onSubmit(word)} />
 				) : null}
-				<div style={{ ...styles.btn, right: '20px' }}
-						 onClick={() => this.onRandomize()}>
-					<Avatar style={{ background: 'var(--accent)' }}
-									size={36}
-									shadow={false}>
-						<IconRefreshOutline width={28}
-																height={28}
-																fill="var(--white)" />
-					</Avatar>
-				</div>
-				<div style={{ ...styles.btn, left: '20px' }}
-						 onClick={() => this.onShowWords()}>
-					<Avatar style={{ background: 'var(--accent)' }}
-									size={36}
-									shadow={false}>
-						<IconWaterDropOutline width={28}
-																	height={28}
-																	fill="var(--white)" />
-						<span style={styles.btnOverlay}>{storage.extraWords.length}</span>
-					</Avatar>
-				</div>
-				{(storage.hasWords ? false : !storage.opponent) ? (
-					<div style={{ ...styles.btn, bottom: '70px', right: '20px' }}
-							 onClick={() => this.invite()}>
-						<Avatar style={{ background: 'var(--accent)' }}
-										size={36}
-										shadow={false}>
-							<IconUserAddOutline width={24}
-																	height={24}
-																	fill="var(--white)" />
-						</Avatar>
-					</div>
-				) : null}
+				{this.BtnRandomize()}
+				{this.BtnWords()}
+				{this.BtnInvite()}
+				{snackbar}
 			</Panel>
 		)
 	}
@@ -116,7 +168,7 @@ export class Game extends Component {
 
 const styles = {
 	btn: {
-		zIndex: 100,
+		zIndex: 1,
 		bottom: '20px',
 		position: 'fixed'
 	},
