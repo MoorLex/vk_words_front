@@ -9,11 +9,18 @@ import {
 } from '@vkontakte/vkui'
 import { socket } from '../server'
 import { actions } from '../store'
-import { setGame } from '../game'
+import { game, setGame } from '../game'
 import IconFavoriteOutline from '@vkontakte/icons/dist/56/favorite_outline'
 import IconUsersOutline from '@vkontakte/icons/dist/56/users_outline'
 
 export class Loading extends Component {
+
+	async reloadGame () {
+		const { storageUpdate } = this.props
+		storageUpdate({ refreshing: true, opponent: undefined })
+		const { words, words_length } = game
+		socket.emit('core/start', { words: words.length, wordsLength: words_length })
+	}
 
 	componentDidMount () {
 		const { storageUpdate, userUpdate, navigate, closePopup, closeModal, openPopup } = this.props

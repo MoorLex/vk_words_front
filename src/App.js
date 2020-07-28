@@ -44,21 +44,13 @@ export class App extends Component{
 		this.setState({ activePanel })
 	}
 
-	async reloadGame () {
-		const { storageUpdate } = this.props
-		storageUpdate({ refreshing: true, opponent: undefined })
-		const { words, words_length } = game
-		socket.emit('core/start', { words: words.length, wordsLength: words_length })
-	}
-
 	render () {
 		const { activePanel } = this.state
 		const { popup } = this.props
 
 		return (
 			<View popout={popup}
-						modal={<Modals onClose={() => this.navigate('main')}
-													 onReload={() => this.reloadGame()} />}
+						modal={<Modals onClose={() => this.navigate('main')} />}
 						activePanel={activePanel}>
 				<Loading id="loading"
 								 navigate={this.navigate} />
