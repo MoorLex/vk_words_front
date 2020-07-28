@@ -4,6 +4,12 @@ export const PLAYERS_UPDATE = 'players/update'
 export const USER_UPDATE = 'user/update'
 export const STORAGE_UPDATE = 'storage/update'
 export const STORAGE_ADD_WORD = 'storage/add_word'
+export const MODALS_USER = 'modals/user'
+export const MODALS_INVITE = 'modals/invite'
+export const MODALS_WORDS = 'modals/words'
+export const MODALS_CLOSE = 'modals/close'
+export const POPUP_OPEN = 'popup/open'
+export const POPUP_CLOSE = 'popups/close'
 
 function players(state = [], action){
   switch (action.type) {
@@ -16,12 +22,10 @@ function players(state = [], action){
 
 const INITIAL_STORAGE = {
   words: 0,
-  stop: false,
   promo: undefined,
   opponent: undefined,
   connected: false,
   refreshing: false,
-  activeModal: null,
   hasWords: false,
   theme: 'light',
   slideIndex: 0,
@@ -61,9 +65,42 @@ function user(state = INITIAL_USER, action){
   }
 }
 
+const INITIAL_MODALS = {
+  active: null,
+  data: undefined,
+}
+function modals(state = INITIAL_MODALS, action){
+  switch (action.type) {
+    case MODALS_USER:
+      return { active: 'modal-user', data: action.payload.data }
+    case MODALS_INVITE:
+      return { active: 'modal-invite', data: action.payload.data }
+    case MODALS_WORDS:
+      return { active: 'modal-words', data: action.payload.data }
+    case MODALS_CLOSE:
+      return { active: null, data: undefined }
+    default:
+      return state
+  }
+}
+
+const INITIAL_POPUP = null
+function popup(state = INITIAL_POPUP, action){
+  switch (action.type) {
+    case POPUP_OPEN:
+      return action.payload.data
+    case POPUP_CLOSE:
+      return null
+    default:
+      return state
+  }
+}
+
 const stores = combineReducers({
   players,
   storage,
+  modals,
+  popup,
   user
 });
 
@@ -91,6 +128,42 @@ export const actions = {
   storageAddWord(data) {
     return {
       type: STORAGE_ADD_WORD,
+      payload: { data }
+    }
+  },
+  showUserModal(data) {
+    return {
+      type: MODALS_USER,
+      payload: { data }
+    }
+  },
+  showInviteModal(data) {
+    return {
+      type: MODALS_INVITE,
+      payload: { data }
+    }
+  },
+  showWordsModal(data) {
+    return {
+      type: MODALS_WORDS,
+      payload: { data }
+    }
+  },
+  closeModal(data) {
+    return {
+      type: MODALS_CLOSE,
+      payload: { data }
+    }
+  },
+  openPopup(data) {
+    return {
+      type: POPUP_OPEN,
+      payload: { data }
+    }
+  },
+  closePopup(data) {
+    return {
+      type: POPUP_CLOSE,
       payload: { data }
     }
   }

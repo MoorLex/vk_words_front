@@ -10,64 +10,35 @@ import {
   Button,
   Placeholder,
   Avatar,
+  SimpleCell,
+  Group,
+  InfoRow,
   Div
 } from '@vkontakte/vkui'
-import vkQr from '@vkontakte/vk-qr';
 import IconDismiss from '@vkontakte/icons/dist/24/dismiss'
 import { actions } from '../store'
 
 export class Modals extends Component {
-  onClose () {
-    const { activeModal, storageUpdate, onClose } = this.props
-    if (activeModal === 'finish-modal') {
-      storageUpdate({
-        stop: false,
-        activeModal: null
-      })
-      onClose()
-    } else {
-      storageUpdate({ stop: false })
-    }
-  }
-
-  onHide () {
-    const { storageUpdate } = this.props
-    storageUpdate({
-      stop: false,
-      activeModal: null
-    })
-  }
 
   ModalInvite () {
-    const { user } = this.props
-    const foregroundColor = getComputedStyle(document.documentElement)
-      .getPropertyValue('--placeholder_icon_foreground_secondary')
-    const qrSvg = vkQr.createQR('https://vk.com/app7500339/#' + user.socket, {
-      ecc: 2,
-      qrSize: 256,
-      logoColor: '#6358b8',
-      foregroundColor,
-      isShowLogo: true
-    });
-
-    const buff = new Buffer(qrSvg);
-    const base64data = buff.toString('base64');
+    const { modals, closeModal } = this.props
+    const { qr, link } = modals.data || {}
 
     return (
       <ModalCard id="modal-invite"
-                 onClose={() => this.onHide()}
+                 onClose={() => closeModal()}
                  icon={<Avatar size={200}
                                mode="image"
                                shadow={false}
                                style={{ background: 'transparent' }}
-                               src={`data:image/svg+xml;base64,${base64data}`} />}
+                               src={qr ? `data:image/svg+xml;base64,${qr}` : undefined} />}
                  header="Играйте вместе!"
                  caption="Попросите друга отсканировать QR код"
                  actions={[{
                    title: 'Поделиться ссылкой',
                    mode: 'primary',
                    action: () => {
-                     bridge.send("VKWebAppShare", {"link": 'https://vk.com/app7500339/#' + user.socket});
+                     bridge.send("VKWebAppShare", { link });
                    }
                  }]}
                  actionsLayout="vertical" />
@@ -75,19 +46,20 @@ export class Modals extends Component {
   }
 
   ModalWords () {
-    const { storage } = this.props
+    const {  modals, closeModal } = this.props
+    const extraWords = modals.data || []
 
     return (
-      <ModalPage id="words-modal"
-                 onClose={() => this.onHide()}
+      <ModalPage id="modal-words"
+                 onClose={() => closeModal()}
                  header={
-                   <ModalPageHeader right={<PanelHeaderButton onClick={() => this.onHide()}><IconDismiss /></PanelHeaderButton>}>
+                   <ModalPageHeader right={<PanelHeaderButton onClick={() => closeModal()}><IconDismiss /></PanelHeaderButton>}>
                      Дополнительные слова
                    </ModalPageHeader>
                  }>
-        {storage.extraWords.length > 0 ? (
+        {extraWords.length > 0 ? (
           <Div>
-            {storage.extraWords.map((word) => (
+            {extraWords.map((word) => (
               <Button style={{ marginRight: '10px', marginBottom: '10px', pointerEvents: 'none' }}
                       key={word}>
                 {word}
@@ -101,20 +73,51 @@ export class Modals extends Component {
     )
   }
 
-  render () {
-    const { activeModal } = this.props
+  ModalUser () {
+    const { modals, closeModal } = this.props
+    const { user_name, user_avatar, user_country, words, games_count, games_finished } = modals.data || {}
+
     return (
-      <ModalRoot activeModal={activeModal}
+      <ModalCard id="modal-user"
+                 onClose={() => closeModal()}
+                 actionsLayout="vertical">
+        <SimpleCell
+          style={{ pointerEvents: 'none' }}
+          description={words + ' найденных слов'}
+          before={<Avatar src={user_avatar} />}
+        >
+          {user_name}
+        </SimpleCell>
+        <Group style={{ pointerEvents: 'none' }}>
+          <SimpleCell>
+            <InfoRow header="Страна">{user_country}</InfoRow>
+          </SimpleCell>
+          <SimpleCell>
+            <InfoRow header="Созданных игр">{games_count}</InfoRow>
+          </SimpleCell>
+          <SimpleCell>
+            <InfoRow header="Выйгранных игр">{games_finished}</InfoRow>
+          </SimpleCell>
+        </Group>
+      </ModalCard>
+    )
+  }
+
+  render () {
+    const { modals } = this.props
+    return (
+      <ModalRoot activeModal={modals.active}
                  onClose={() => this.onClose()}>
         {this.ModalWords()}
         {this.ModalInvite()}
+        {this.ModalUser()}
       </ModalRoot>
     )
   }
 }
 
 const mapStateToProps = (state) => {
-  const { storage, user } = state
-  return { storage, user }
+  const { modals } = state
+  return { modals }
 }
 export default connect(mapStateToProps, actions)(Modals)

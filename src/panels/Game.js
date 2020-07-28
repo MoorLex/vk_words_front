@@ -7,6 +7,7 @@ import {
 	Avatar,
 	Snackbar
 } from '@vkontakte/vkui'
+import vkQr from '@vkontakte/vk-qr';
 import IconRefreshOutline from '@vkontakte/icons/dist/28/refresh_outline'
 import IconWaterDropOutline from '@vkontakte/icons/dist/28/water_drop_outline'
 import IconUserAddOutline from '@vkontakte/icons/dist/28/user_add_outline'
@@ -33,11 +34,11 @@ export class Game extends Component {
 		storageUpdate({ extraWords: [], hasWords: false })
 
 		socket.on('opponent/joined', ({ name, socket }) => {
-			storageUpdate({ activeModal: null, stop: false, opponent: socket })
+			storageUpdate({ opponent: socket })
 			this.onUserJoined(name)
 		})
 		socket.on('opponent/disconnected', () => {
-			storageUpdate({ activeModal: null, stop: false, opponent: undefined })
+			storageUpdate({ opponent: undefined })
 			this.onUserDisconnect()
 		})
 	}
@@ -51,17 +52,15 @@ export class Game extends Component {
 	onUserJoined (name) {
 		if (this.state.snackbar) return;
 
-		setTimeout(() => {
-			this.setState({ snackbar:
-					<Snackbar layout="vertical"
-										onClose={() => this.setState({ snackbar: null })}
-										before={<Avatar size={24} style={{ backgroundColor: 'var(--accent)' }}>
-											<IconUser fill="#fff" width={14} height={14} />
-										</Avatar>}>
-						{name} подключился(-лась) к игре
-					</Snackbar>
-			});
-		}, 500)
+		this.setState({ snackbar:
+				<Snackbar layout="vertical"
+									onClose={() => this.setState({ snackbar: null })}
+									before={<Avatar size={24} style={{ backgroundColor: 'var(--accent)' }}>
+										<IconUser fill="#fff" width={14} height={14} />
+									</Avatar>}>
+					{name} подключился(-лась) к игре
+				</Snackbar>
+		});
 	}
 
 	onUserDisconnect () {
@@ -83,8 +82,8 @@ export class Game extends Component {
 	}
 
 	onShowWords () {
-		const { storageUpdate } = this.props
-		storageUpdate({ activeModal: 'words-modal', stop: true })
+		const { showWordsModal, storage } = this.props
+		showWordsModal(storage.extraWords)
 	}
 
 	onSubmit (word) {
@@ -100,8 +99,21 @@ export class Game extends Component {
 	}
 
 	invite () {
-		const { storageUpdate } = this.props
-		storageUpdate({ activeModal: 'modal-invite', stop: true })
+		const { showInviteModal, user, storage } = this.props
+		const link = 'https://vk.com/app7500339/#' + user.socket
+		const foregroundColor = storage.theme === 'light' ? '#aeb7c2' : '#5d5f61'
+		const qrSvg = vkQr.createQR(link, {
+			ecc: 2,
+			qrSize: 256,
+			logoColor: '#6358b8',
+			foregroundColor,
+			isShowLogo: true
+		});
+
+		const buff = new Buffer(qrSvg);
+		const qr = buff.toString('base64');
+
+		showInviteModal({ qr, link })
 	}
 
 	close () {
@@ -162,7 +174,7 @@ export class Game extends Component {
 	}
 
 	render () {
-		const { storage, storageUpdate } = this.props
+		const { storage, storageUpdate, modals, popup } = this.props
 		const { snackbar } = this.state
 
 		return (
@@ -173,7 +185,7 @@ export class Game extends Component {
 				{!storage.refreshing ? (
 					<Canvas ref={(ref) => this.canvas = ref}
 									game={game}
-									stop={storage.stop}
+									stop={modals.active || popup}
 									theme={storage.theme}
 									findExtraWord={(word) => this.findExtraWord(word)}
 									findWord={() => storageUpdate({ hasWords: true })}
@@ -209,7 +221,7 @@ const styles = {
 }
 
 const mapStateToProps = (state) => {
-	const { user, storage } = state
-	return { user, storage }
+	const { user, modals, storage, popup } = state
+	return { user, modals, storage, popup }
 }
 export default connect(mapStateToProps, actions)(Game)

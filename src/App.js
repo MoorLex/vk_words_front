@@ -1,11 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import bridge from '@vkontakte/vk-bridge'
-import {
-	View,
-	Alert,
-	ScreenSpinner
-} from '@vkontakte/vkui'
+import { View } from '@vkontakte/vkui'
 import '@vkontakte/vkui/dist/vkui.css'
 import { socket } from './server'
 import { actions } from './store'
@@ -18,8 +14,6 @@ import Loading from './panels/Loading'
 import Error403 from './panels/Error_403'
 import Launch from './panels/Launch'
 import ErrorDisconnect from './panels/Error_Disconnect'
-import IconFavoriteOutline from '@vkontakte/icons/dist/56/favorite_outline'
-import IconUsersOutline from '@vkontakte/icons/dist/56/users_outline'
 
 export class App extends Component{
 	constructor(props) {
@@ -50,55 +44,28 @@ export class App extends Component{
 		this.setState({ activePanel })
 	}
 
-	loading = (isLoading) => {
-		this.setState({ popout: isLoading ? <ScreenSpinner /> : null })
-	}
-
-	finish = (isFinish, data = {}) => {
-		this.setState({ popout: isFinish ? (
-				<Alert onClose={() => {
-									this.finish(false)
-									this.navigate('main')
-								}}
-							 actions={[{
-								 title: 'Сыграть еще',
-								 action: () => this.reloadGame()
-							 }]} >
-					<div style={{ display: 'flex', justifyContent: 'center' }}>
-						{data.win ? (<IconFavoriteOutline />) : (<IconUsersOutline />)}
-					</div>
-					<h2>{data.win ? 'Вы нашли все слова!' : 'Ваш противник выйграл!'}</h2>
-					<p>Хотите повторить игру?</p>
-				</Alert>
-			) : null })
-	}
-
 	async reloadGame () {
 		const { storageUpdate } = this.props
-		storageUpdate({ refreshing: true, activeModal: null, stop: false, opponent: undefined })
+		storageUpdate({ refreshing: true, opponent: undefined })
 		const { words, words_length } = game
 		socket.emit('core/start', { words: words.length, wordsLength: words_length })
 	}
 
 	render () {
-		const { activePanel, popout } = this.state
-		const { storage } = this.props
+		const { activePanel } = this.state
+		const { popup } = this.props
 
 		return (
-			<View popout={popout}
-						modal={<Modals activeModal={storage.activeModal}
-													 onClose={() => this.navigate('main')}
+			<View popout={popup}
+						modal={<Modals onClose={() => this.navigate('main')}
 													 onReload={() => this.reloadGame()} />}
 						activePanel={activePanel}>
 				<Loading id="loading"
-								 navigate={this.navigate}
-								 finish={this.finish}
-								 loading={this.loading} />
+								 navigate={this.navigate} />
 				<Launch id="launch"
 								navigate={this.navigate} />
 				<Main id="main"
-							navigate={this.navigate}
-							loading={this.loading} />
+							navigate={this.navigate} />
 				<Game id="game"
 							navigate={this.navigate} />
 				<Error403 id="error_403"
@@ -111,8 +78,8 @@ export class App extends Component{
 }
 
 const mapStateToProps = (state) => {
-	const { user, storage } = state
-	return { user, storage }
+	const { user, storage, popup } = state
+	return { user, storage, popup }
 }
 export default connect(mapStateToProps, actions)(App)
 

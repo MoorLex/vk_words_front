@@ -14,7 +14,8 @@ import {
 	Div,
 	Title,
 	Caption,
-	Footer
+	Footer,
+	ScreenSpinner
 } from '@vkontakte/vkui'
 import { api } from '../api'
 import bridge from '@vkontakte/vk-bridge'
@@ -71,8 +72,8 @@ export class Main extends Component {
 	}
 
 	async startGame ({ words, wordsLength }) {
-		const { loading } = this.props
-		loading(true)
+		const { openPopup } = this.props
+		openPopup(<ScreenSpinner />)
 		socket.emit('core/start', { words, wordsLength })
 	}
 
@@ -89,6 +90,14 @@ export class Main extends Component {
 		const { storageUpdate } = this.props
 		const promo = await bridge.send('VKWebAppGetAds')
 		storageUpdate({ promo });
+	}
+
+	async onUserClick (user) {
+		const { showUserModal } = this.props
+
+		const data = await api.getUserData(user.id)
+		console.log(data)
+		showUserModal(data)
 	}
 
 	componentDidMount () {
@@ -160,6 +169,7 @@ export class Main extends Component {
 							{players.map((user, i) => (
 								<User key={user.id}
 											index={i}
+											onClick={() => this.onUserClick(user)}
 											{...user}/>
 							))}
 						</FlipMove>
@@ -173,17 +183,25 @@ export class Main extends Component {
 
 class User extends Component {
 	render() {
-		const { name, avatar, words, index } = this.props;
+		const { name, avatar, words, index, onClick } = this.props;
 
 		return (
 			<SimpleCell description={ words + ' найденных слов'}
-									style={{ backgroundColor: 'var(--background_content)', pointerEvents: 'none' }}
-									before={<Avatar src={avatar}/>}>
+									onClick={onClick}
+									style={{ backgroundColor: 'var(--background_content)', cursor: 'pointer' }}
+									before={<Avatar src={avatar}>
+										<span style={{ position: 'absolute', bottom: 0, right: 0 }}>
+											{index < 4 ? (
+												<Avatar style={{ background: 'var(--background_content)' }}
+																size={18}
+																shadow={false}>
+													<IconFire style={{ color: 'var(--dynamic_red)' }}/>
+												</Avatar>
+											) : null}
+										</span>
+									</Avatar>}>
 				<div style={{ display: 'flex', alignItems: 'center' }}>
 					<span style={{ marginRight: '4px' }}>{name}</span>
-					{index === 0 ? (
-						<IconFire style={{ color: 'var(--dynamic_red)' }}/>
-					) : null}
 				</div>
 			</SimpleCell>
 		)

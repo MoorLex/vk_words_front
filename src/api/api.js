@@ -44,4 +44,10 @@ export default class Api {
     this.observer.broadcast('getBestPlayers', data.data)
     return data.data
   }
+
+  async getUserData (id) {
+    const { data } = await this.request(HttpMethodsEnum.GET, '/user/' + id)
+    this.observer.broadcast('getUserData', data.data)
+    return data.data
+  }
 }
