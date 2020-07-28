@@ -5,7 +5,7 @@ import CharBtn from './game/CharBtn'
 import GridCell from './game/GridCell'
 import GridLine from './game/GridLine'
 import WritingWord from './game/WritingWord'
-import { isSafari, FinalEvent } from '../game/utils'
+import { isSafari, FinalEvent } from '../utils'
 import { socket } from '../server'
 
 export default class Canvas extends Component {

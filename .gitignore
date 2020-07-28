@@ -17,3 +17,4 @@ bundle.zip
 .vscode
 .idea
 .env
+.env.production

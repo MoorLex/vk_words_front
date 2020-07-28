@@ -29,13 +29,17 @@ export class Game extends Component {
 	}
 
 	componentDidMount () {
-		const { storageUpdate } = this.props
+		const { storageUpdate, closeModal } = this.props
 		document.body.style.overflow = 'hidden'
 		storageUpdate({ extraWords: [], hasWords: false })
 
 		socket.on('opponent/joined', ({ name, socket }) => {
+			const modalRoot = document.querySelector('.ModalRoot')
+			if (modalRoot && !modalRoot.classList.contains('ModalRoot--touched')) {
+				closeModal()
+			}
 			storageUpdate({ opponent: socket })
-			this.onUserJoined(name)
+			setTimeout(() => this.onUserJoined(name), 500)
 		})
 		socket.on('opponent/disconnected', () => {
 			storageUpdate({ opponent: undefined })

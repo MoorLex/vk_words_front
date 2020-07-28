@@ -30,8 +30,14 @@ export class Loading extends Component {
 
 		bridge.send("VKWebAppGetUserInfo").then((data) => {
 			userUpdate(data)
-			socket.emit('core/init', { ...data, params: window.location.href.split('?')[1].split('#')[0] })
+			socket.emit('core/init', { ...data, params: window.location.search.slice(1).split('#')[0] })
 		})
+
+		if (process.env.REACT_APP_LOCAL_USER_DATA) {
+			const data = JSON.parse(process.env.REACT_APP_LOCAL_USER_DATA)
+			userUpdate(data)
+			socket.emit('core/init', { ...data, params: window.location.search.slice(1) })
+		}
 
 		// document.body.setAttribute('scheme', 'space_gray');
 
@@ -90,6 +96,8 @@ export class Loading extends Component {
 
 		socket.on('core/error', (data) => {
 			console.warn(data)
+			closePopup()
+			closeModal()
 			if (window.location.href.split('#')[0]) {
 				window.history.pushState("", document.title, window.location.href.split('#')[0]);
 			}
@@ -109,9 +117,8 @@ export class Loading extends Component {
 		})
 		socket.on('disconnect', () => {
 			navigate('error_disconnect')
-			storageUpdate({
-				activeModal: null
-			})
+			closePopup()
+			closeModal()
 		})
 	}
 

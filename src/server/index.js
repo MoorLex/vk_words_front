@@ -1,6 +1,10 @@
 import openSocket from 'socket.io-client';
 
-export let socket = openSocket('https://moore-vk-apps.tk', { path: '/vk_words/socket.io', reconnection: false });
+export let socket = openSocket(process.env.REACT_APP_SERVER_URL, {
+  path: '/vk_words/socket.io',
+  query: window.location.search.slice(1),
+  reconnection: false
+});
 
 socket.onclose = function(event) {
   if (event.wasClean) {

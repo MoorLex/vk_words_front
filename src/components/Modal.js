@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { platform } from '../utils'
 import bridge from '@vkontakte/vk-bridge'
 import {
   ModalRoot,
@@ -23,6 +24,17 @@ export class Modals extends Component {
   ModalInvite () {
     const { modals, closeModal } = this.props
     const { qr, link } = modals.data || {}
+    const actions = []
+
+    if (platform() !== 'mobile_web') {
+      actions.push({
+        title: 'Поделиться ссылкой',
+        mode: 'primary',
+        action: () => {
+          bridge.send("VKWebAppShare", { link });
+        }
+      })
+    }
 
     return (
       <ModalCard id="modal-invite"
@@ -34,13 +46,7 @@ export class Modals extends Component {
                                src={qr ? `data:image/svg+xml;base64,${qr}` : undefined} />}
                  header="Играйте вместе!"
                  caption="Попросите друга отсканировать QR код"
-                 actions={[{
-                   title: 'Поделиться ссылкой',
-                   mode: 'primary',
-                   action: () => {
-                     bridge.send("VKWebAppShare", { link });
-                   }
-                 }]}
+                 actions={actions}
                  actionsLayout="vertical" />
     )
   }

@@ -5,7 +5,7 @@ import Observer from './observer'
 export default class Api {
   constructor () {
     this.observer = new Observer()
-    this.baseUrl = process.env.API_URL || 'https://moore-vk-apps.tk/vk_words'
+    this.baseUrl =  process.env.REACT_APP_SERVER_URL + '/vk_words'
     this.axios = axios.create({
       baseURL: this.baseUrl
     })
@@ -24,7 +24,7 @@ export default class Api {
     const config = {
       method: (method === HttpMethodsEnum.PUT) ? HttpMethodsEnum.POST : method,
       headers: headers,
-      url: url
+      url: url + window.location.search
     }
     if (method === HttpMethodsEnum.GET) {
       config.params = params
