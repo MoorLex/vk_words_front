@@ -89,9 +89,11 @@ export class Modals extends Component {
           {user_name}
         </SimpleCell>
         <Group style={{ pointerEvents: 'none' }}>
-          <SimpleCell>
-            <InfoRow header="Страна">{user_country}</InfoRow>
-          </SimpleCell>
+          {user_country ? (
+            <SimpleCell>
+              <InfoRow header="Страна">{user_country}</InfoRow>
+            </SimpleCell>
+          ) : null}
           <SimpleCell>
             <InfoRow header="Созданных игр">{games_count}</InfoRow>
           </SimpleCell>

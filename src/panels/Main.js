@@ -96,7 +96,6 @@ export class Main extends Component {
 		const { showUserModal } = this.props
 
 		const data = await api.getUserData(user.id)
-		console.log(data)
 		showUserModal(data)
 	}
 
@@ -191,7 +190,7 @@ class User extends Component {
 									style={{ backgroundColor: 'var(--background_content)', cursor: 'pointer' }}
 									before={<Avatar src={avatar}>
 										<span style={{ position: 'absolute', bottom: 0, right: 0 }}>
-											{index < 4 ? (
+											{index < 3 ? (
 												<Avatar style={{ background: 'var(--background_content)' }}
 																size={18}
 																shadow={false}>

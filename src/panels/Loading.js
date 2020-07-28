@@ -26,26 +26,6 @@ export class Loading extends Component {
 			socket.emit('core/init', { ...data, params: window.location.href.split('?')[1].split('#')[0] })
 		})
 
-		socket.emit('core/init', {
-			"params": 'vk_access_token_settings=&vk_app_id=7500339&vk_are_notifications_enabled=0&vk_is_app_user=1&vk_is_favorite=0&vk_language=ru&vk_platform=desktop_web&vk_ref=other&vk_user_id=34080615&sign=GEsSbMZ96vYzll2A85TjGN7Lik4l7jlStdMpvFFmFaE',
-			"id": 34080615,
-			"first_name": "Ирина",
-			"last_name": "Денежкина",
-			"sex": 1,
-			"city": {
-				"id": 2,
-				"title": "Санкт-Петербург"
-			},
-			"country": {
-				"id": 1,
-				"title": "Россия"
-			},
-			"bdate": "10.4.1990",
-			"photo_100": "https://pp.userapi.com/c836333/v836333553/5b138/2eWBOuj5A4g.jpg",
-			"photo_200": "https://pp.userapi.com/c836333/v836333553/5b137/tEJNQNigU80.jpg",
-			"timezone": 3
-		})
-
 		// document.body.setAttribute('scheme', 'space_gray');
 
 		socket.on('connect', () => {
