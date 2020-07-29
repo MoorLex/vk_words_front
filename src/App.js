@@ -32,6 +32,10 @@ export class App extends Component{
 				const schemeAttribute = document.createAttribute('scheme');
 				schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
 				document.body.attributes.setNamedItem(schemeAttribute);
+				bridge.send("VKWebAppSetViewSettings", {
+					status_bar_style: data.scheme === 'space_gray' ? 'light' : 'dark',
+					action_bar_color: data.scheme === 'space_gray' ? '#19191a' : '#ffffff'
+				});
 			}
 			if (type === 'VKWebAppViewHide') { onBlur() }
 			if (type === 'VKWebAppViewRestore') { onBlur() }

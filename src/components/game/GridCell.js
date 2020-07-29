@@ -1,8 +1,10 @@
 import anime from 'animejs'
 
-export default class CharBtn {
+export default class GridCell {
   constructor (char, x, y, size) {
     this.char = char
+    this.bgColor = undefined
+    this.colorOpacity = 0
     this.border = 6
     this.borderRadius = size * 0.2
     this.size = size - this.border
@@ -25,6 +27,27 @@ export default class CharBtn {
     anime({
       targets: cell,
       opacity: 255,
+      duration: 800,
+      ...options
+    })
+  }
+
+  paint (options, color) {
+    const cell = this
+    this.bgColor = color
+    anime({
+      targets: cell,
+      colorOpacity: 255,
+      duration: 800,
+      ...options
+    })
+  }
+
+  reset (options) {
+    const cell = this
+    anime({
+      targets: cell,
+      colorOpacity: 0,
       duration: 800,
       ...options
     })

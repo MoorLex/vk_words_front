@@ -33,6 +33,10 @@ export default class Canvas extends Component {
       this.writingWord.close('up')
       props.findWord()
     })
+    socket.on('game/word/reopen', ({ word, color }) => {
+      this.openWord(word, color)
+      this.writingWord.close()
+    })
     socket.on('game/word/extra', ({ word }) => {
       props.findExtraWord(word)
       this.writingWord.close('left')
@@ -138,12 +142,18 @@ export default class Canvas extends Component {
     sketch.noStroke()
     sketch.rectMode(sketch.CORNER)
     sketch.textAlign(sketch.CENTER, sketch.CENTER)
-    this.grid.forEach(({ char, x, y, size, isOpen, borderRadius, opacity, textSize }) => {
+    this.grid.forEach(({ char, x, y, size, isOpen, borderRadius, opacity, textSize, bgColor, colorOpacity }) => {
       sketch.fill(color)
       sketch.rect(x, y, size, size, borderRadius)
       if (isOpen) {
+        if (bgColor) {
+          const rectColor = sketch.color(bgColor)
+          rectColor.setAlpha(colorOpacity)
+          sketch.fill(rectColor)
+          sketch.rect(x, y, size, size, borderRadius)
+        }
         sketch.textSize(textSize)
-        sketch.fill(theme === 'light' ? 0 : 255, theme === 'light' ? 0 : 255, theme === 'light' ? 0 : 255, opacity)
+        sketch.fill(theme === 'light' ? 0 : 255, opacity)
         sketch.text(char.toUpperCase(), x + (size / 2), y + (size / 2) + (isSafari() ? 0 : 1))
       }
     })
@@ -298,7 +308,9 @@ export default class Canvas extends Component {
     const { onSubmit } = this.props
     const word = this.selected.reduce((arr, { char }) => [...arr, char], [])
 
-    onSubmit(word.join(''))
+    if(word.join('')) {
+      onSubmit(word.join(''))
+    }
 
     setTimeout(() => {
       if (this.writingWord.show) {
@@ -314,10 +326,22 @@ export default class Canvas extends Component {
         return position.y === word.y && position.x >= word.x && position.x <= word.x + word.word.length
       }
     })
-    this.makeGridLine(word.vertical, chars, color)
-    chars.forEach((char, i) => {
-      char.open({ delay: i * 100 })
-    })
+
+    if (chars.every((char) => char.isOpen)) {
+      chars.forEach((char, i) => {
+        char.paint({ delay: i * 100 }, color)
+      })
+      setTimeout(() => {
+        chars.forEach((char, i) => {
+          char.reset({ delay: i * 100 })
+        })
+      }, 500)
+    } else {
+      this.makeGridLine(word.vertical, chars, color)
+      chars.forEach((char, i) => {
+        char.open({ delay: i * 100 })
+      })
+    }
   }
   makeGridLine (vertical, chars, color) {
     const offset = chars[0].size / 2

@@ -56,7 +56,7 @@ export class Launch extends Component {
 												 header="Будь лучшим"
 												 action={<Button size="l" onClick={() => navigate('main')}>Начать</Button>}
 												 stretched>
-							Выйграйте уровни и получите очки за отгаданные слова
+							Выиграйте уровни и получите очки за отгаданные слова
 						</Placeholder>
 					</div>
 				</Gallery>
