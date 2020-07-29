@@ -104,7 +104,7 @@ export class Modals extends Component {
             <InfoRow header="Созданных игр">{games_count}</InfoRow>
           </SimpleCell>
           <SimpleCell>
-            <InfoRow header="Выйгранных игр">{games_finished}</InfoRow>
+            <InfoRow header="Выигранных игр">{games_finished}</InfoRow>
           </SimpleCell>
         </Group>
       </ModalCard>

@@ -22,11 +22,14 @@ import bridge from '@vkontakte/vk-bridge'
 import IconFire from '@vkontakte/icons/dist/12/fire'
 import { actions } from '../store'
 import { socket } from '../server'
+import { platform } from '../utils'
 import CountUp from 'react-countup'
 import FlipMove from 'react-flip-move'
 
 export class Main extends Component {
-	constructor(props) {
+	addScript
+
+	constructor (props) {
 		super(props)
 		this.state = {
 			words: props.user.words,
@@ -102,7 +105,23 @@ export class Main extends Component {
 	componentDidMount () {
 		this.loadBestPlayers()
 		this.loadPromo()
+		this.loadDesktopAdds()
 		document.body.style.overflow = 'auto'
+	}
+
+	loadDesktopAdds () {
+		if (platform() === 'desktop_web') {
+			this.addScript = document.createElement('script')
+			this.addScript.innerText = `setTimeout(function() {var adsParams = {"ad_unit_id":127515,"ad_unit_hash":"0863c5bcc2b8afd82320a530edc504a7"};function vkAdsInit() {VK.Widgets.Ads('vk_ads_127515', {}, adsParams);}if (window.VK && VK.Widgets) {vkAdsInit();} else {if (!window.vkAsyncInitCallbacks) window.vkAsyncInitCallbacks = [];vkAsyncInitCallbacks.push(vkAdsInit);var protocol = ((location.protocol === 'https:') ? 'https:' : 'http:');var adsElem = document.getElementById('vk_ads_127515');var scriptElem = document.createElement('script');scriptElem.type = 'text/javascript';scriptElem.async = true;scriptElem.src = protocol + '//vk.com/js/api/openapi.js?168';adsElem.parentNode.insertBefore(scriptElem, adsElem.nextSibling);}}, 0);`
+
+			document.body.appendChild(this.addScript)
+		}
+	}
+
+	componentWillUnmount () {
+		if (this.addScript) {
+			this.addScript.outerHTML = ''
+		}
 	}
 
 	render () {
@@ -161,20 +180,29 @@ export class Main extends Component {
 					<PromoBanner bannerData={storage.promo}
 											 onClose={() => storageUpdate({ promo: undefined })} />
 				) : null}
-				{(players.length > 0) ? (
-					<Group>
-						<Header mode="secondary">Лучшие игроки</Header>
-						<FlipMove>
-							{players.map((user, i) => (
-								<User key={user.id}
-											index={i}
-											onClick={() => this.onUserClick(user)}
-											{...user}/>
-							))}
-						</FlipMove>
-						<Footer>By Moorlex</Footer>
-					</Group>
-				) : null}
+				<div style={{ display: 'flex' }}>
+					<div style={{ flex: '1' }}>
+						{(players.length > 0) ? (
+							<Group>
+								<Header mode="secondary">Лучшие игроки</Header>
+								<FlipMove>
+									{players.map((user, i) => (
+										<User key={user.id}
+													index={i}
+													onClick={() => this.onUserClick(user)}
+													{...user}/>
+									))}
+								</FlipMove>
+							</Group>
+						) : null}
+					</div>
+					{platform() === 'desktop_web' ? (
+						<div style={{ flex: '0 0 200px', display: 'flex', justifyContent: 'center' }}>
+							<div id="vk_ads_127515" />
+						</div>
+					) : null}
+				</div>
+				<Footer>By Moorlex</Footer>
 			</Panel>
 		)
 	}

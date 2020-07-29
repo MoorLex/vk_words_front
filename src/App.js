@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import bridge from '@vkontakte/vk-bridge'
 import { View } from '@vkontakte/vkui'
 import '@vkontakte/vkui/dist/vkui.css'
-import { actions } from './store'
+import { actions, onBlur } from './store'
 import Modals from './components/Modal'
 
 import Main from './panels/Main'
@@ -33,6 +33,8 @@ export class App extends Component{
 				schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
 				document.body.attributes.setNamedItem(schemeAttribute);
 			}
+			if (type === 'VKWebAppViewHide') { onBlur() }
+			if (type === 'VKWebAppViewRestore') { onBlur() }
 		})
 
 		// document.body.setAttribute('scheme', 'space_gray');

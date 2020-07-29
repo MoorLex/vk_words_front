@@ -14,7 +14,7 @@ import IconUserAddOutline from '@vkontakte/icons/dist/28/user_add_outline'
 import IconUser from '@vkontakte/icons/dist/24/user'
 import Canvas from '../components/Canvas'
 import { game } from '../game'
-import { actions } from '../store'
+import { actions, onBlur } from '../store'
 import { socket } from '../server'
 
 export class Game extends Component {
@@ -33,6 +33,8 @@ export class Game extends Component {
 		document.body.style.overflow = 'hidden'
 		storageUpdate({ extraWords: [], hasWords: false })
 
+		window.addEventListener('blur', () => onBlur());
+
 		socket.on('opponent/joined', ({ name, socket }) => {
 			const modalRoot = document.querySelector('.ModalRoot')
 			if (modalRoot && !modalRoot.classList.contains('ModalRoot--touched')) {
@@ -49,6 +51,7 @@ export class Game extends Component {
 
 	componentWillUnmount () {
 		document.body.style.overflow = 'auto'
+		window.removeEventListener('blur', () => onBlur());
 		socket.removeAllListeners('opponent/joined')
 		socket.removeAllListeners('opponent/disconnected')
 	}
@@ -182,14 +185,14 @@ export class Game extends Component {
 		const { snackbar } = this.state
 
 		return (
-			<Panel id="game">
+			<Panel id="game" style={{ overflow: 'hidden' }}>
 				<PanelHeader left={<PanelHeaderBack onClick={() => this.close()} />}>
 					Игра
 				</PanelHeader>
 				{!storage.refreshing ? (
 					<Canvas ref={(ref) => this.canvas = ref}
 									game={game}
-									stop={modals.active || popup}
+									stop={modals.active || popup || storage.isBlur}
 									theme={storage.theme}
 									findExtraWord={(word) => this.findExtraWord(word)}
 									findWord={() => storageUpdate({ hasWords: true })}

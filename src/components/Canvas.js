@@ -79,6 +79,10 @@ export default class Canvas extends Component {
     this.drawGrid()
     this.drawSelectedLine()
     this.drawCharsCircle()
+
+    if (this.props.stop) {
+      this.mouseReleased()
+    }
   }
   drawSelectedLine () {
     const { game } = this.props
@@ -180,7 +184,6 @@ export default class Canvas extends Component {
     this.pressChar()
   }
   mouseReleased () {
-    if (this.props.stop) return
     this.checkWord()
     this.selected.forEach((char, i) => {
       setTimeout(() => {

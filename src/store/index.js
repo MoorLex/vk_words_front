@@ -27,6 +27,7 @@ const INITIAL_STORAGE = {
   connected: false,
   refreshing: false,
   hasWords: false,
+  isBlur: false,
   theme: 'light',
   slideIndex: 0,
   extraWords: []
@@ -102,9 +103,10 @@ const stores = combineReducers({
   modals,
   popup,
   user
-});
+})
+const cs = createStore(stores)
 
-export default createStore(stores)
+export default cs
 
 export const actions = {
   playersUpdate(data) {
@@ -167,4 +169,9 @@ export const actions = {
       payload: { data }
     }
   }
+}
+
+export function onBlur () {
+  cs.dispatch(actions.storageUpdate({ isBlur: true }))
+  setTimeout(() => cs.dispatch(actions.storageUpdate({ isBlur: false })), 20)
 }
