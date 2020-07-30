@@ -5,6 +5,7 @@ import {
 	PanelHeader,
 	PanelHeaderBack,
 	Avatar,
+	Subhead,
 	Snackbar
 } from '@vkontakte/vkui'
 import vkQr from '@vkontakte/vk-qr';
@@ -24,7 +25,8 @@ export class Game extends Component {
 		super(props);
 
 		this.state = {
-			snackbar: null
+			snackbar: null,
+			points: {}
 		}
 	}
 
@@ -35,13 +37,16 @@ export class Game extends Component {
 
 		window.addEventListener('blur', () => onBlur());
 
-		socket.on('opponent/joined', ({ name, socket }) => {
+		socket.on('game/pints', (points) => {
+			this.setState({ points })
+		})
+		socket.on('opponent/joined', (opponent) => {
 			const modalRoot = document.querySelector('.ModalRoot')
 			if (modalRoot && !modalRoot.classList.contains('ModalRoot--touched')) {
 				closeModal()
 			}
-			storageUpdate({ opponent: socket })
-			setTimeout(() => this.onUserJoined(name), 500)
+			storageUpdate({ opponent })
+			setTimeout(() => this.onUserJoined(opponent.user_name), 500)
 		})
 		socket.on('opponent/disconnected', () => {
 			storageUpdate({ opponent: undefined })
@@ -105,6 +110,19 @@ export class Game extends Component {
 		}
 	}
 
+	onFind (word) {
+		const { points } = this.state
+		const { storageUpdate } = this.props
+
+		storageUpdate({ hasWords: true })
+
+		if (points[word.isOpen]) {
+			this.setState({ points: { [word.isOpen]: points[word.isOpen] + 1 } })
+		} else {
+			this.setState({ points: { [word.isOpen]: 1 } })
+		}
+	}
+
 	invite () {
 		const { showInviteModal, user, storage } = this.props
 		const link = 'https://vk.com/app7500339/#' + user.socket
@@ -116,6 +134,8 @@ export class Game extends Component {
 			foregroundColor,
 			isShowLogo: true
 		});
+
+		console.log(link)
 
 		const buff = new Buffer(qrSvg);
 		const qr = buff.toString('base64');
@@ -131,7 +151,7 @@ export class Game extends Component {
 
 	BtnRandomize () {
 		return (
-			<div style={{ ...styles.btn, right: '20px' }}
+			<div style={{ ...styles.btn, right: 20 }}
 					 onClick={() => this.onRandomize()}>
 				<Avatar style={{ background: 'var(--accent)' }}
 								size={36}
@@ -148,7 +168,7 @@ export class Game extends Component {
 		const { storage } = this.props
 
 		return (
-			<div style={{ ...styles.btn, left: '20px' }}
+			<div style={{ ...styles.btn, left: 20 }}
 					 onClick={() => this.onShowWords()}>
 				<Avatar style={{ background: 'var(--accent)' }}
 								size={36}
@@ -167,7 +187,7 @@ export class Game extends Component {
 		if ((storage.hasWords ? true : storage.opponent)) return null
 
 		return (
-			<div style={{ ...styles.btn, bottom: '70px', right: '20px' }}
+			<div style={{ ...styles.btn, bottom: 70, right: 20 }}
 					 onClick={() => this.invite()}>
 				<Avatar style={{ background: 'var(--accent)' }}
 								size={36}
@@ -180,8 +200,40 @@ export class Game extends Component {
 		)
 	}
 
+	labelUser (type = 'user') {
+		const { points } = this.state
+		const { storage, user } = this.props
+		const style = { ...styles.btn, ...styles.label, bottom: '25%' }
+		let data = {}
+
+		if (!storage.opponent) return null
+
+		if (type === 'user') {
+			style.left = 20
+			data = user
+			data.color = game.color
+		} else {
+			style.right = 20
+			style.flexDirection = 'row-reverse'
+			data = storage.opponent
+		}
+
+		style.background = data.color
+
+		return (
+			<div style={{ ...style, background: data.color }}>
+				<Avatar src={data.user_avatar}
+								size={20}/>
+				<Subhead weight="bold"
+								 style={{ marginLeft: 7, marginRight: 7, color: '#fff' }}>
+					{points[data.user_id] || 0} / {game.words.length}
+				</Subhead>
+			</div>
+		)
+	}
+
 	render () {
-		const { storage, storageUpdate, modals, popup } = this.props
+		const { storage, modals, popup } = this.props
 		const { snackbar } = this.state
 
 		return (
@@ -195,9 +247,11 @@ export class Game extends Component {
 									stop={modals.active || popup || storage.isBlur}
 									theme={storage.theme}
 									findExtraWord={(word) => this.findExtraWord(word)}
-									findWord={() => storageUpdate({ hasWords: true })}
+									findWord={(word) => this.onFind(word)}
 									onSubmit={(word) => this.onSubmit(word)} />
 				) : null}
+				{this.labelUser('user')}
+				{this.labelUser('opponent')}
 				{this.BtnRandomize()}
 				{this.BtnWords()}
 				{this.BtnInvite()}
@@ -212,6 +266,12 @@ const styles = {
 		zIndex: 1,
 		bottom: '20px',
 		position: 'fixed'
+	},
+	label: {
+		padding: 5,
+		display: 'flex',
+		borderRadius: 50,
+		alignItems: 'center'
 	},
 	btnOverlay: {
 		left: 0,

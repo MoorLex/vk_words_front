@@ -11,10 +11,6 @@ export default class WritingWord {
     this.word = ''
     this.x = x
     this.y = y
-    this.vX = x
-    this.vY = y
-    this._x = x
-    this._y = y
   }
 
   setWord (word, width) {
@@ -26,33 +22,12 @@ export default class WritingWord {
     if (this.show) return
     this.show = true
     this.opacity = 0
-    this.y = this._y + this.height
-    this.x = this._x
-    this.vX = this._x
-    this.vY = this.y - this.height
     this.vOpacity = 255
   }
 
-  close (type) {
+  close () {
     if (!this.show) return
     this.show = false
-    let options = {
-      x: this.x,
-      y: this.y
-    }
-    switch (type) {
-      case 'up':
-        options.y = this.y - this.height
-        break
-      case 'left':
-        options.x = this.x - this.height
-        break
-      default:
-        options.y = this.y + this.height
-        break
-    }
-    this.vX = options.x
-    this.vY = options.y
     this.vOpacity = 0
   }
 

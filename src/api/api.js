@@ -5,7 +5,7 @@ import Observer from './observer'
 export default class Api {
   constructor () {
     this.observer = new Observer()
-    this.baseUrl =  process.env.REACT_APP_SERVER_URL + '/vk_words'
+    this.baseUrl =  process.env.REACT_APP_SERVER_URL
     this.axios = axios.create({
       baseURL: this.baseUrl
     })

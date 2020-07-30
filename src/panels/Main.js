@@ -102,12 +102,20 @@ export class Main extends Component {
 	}
 
 	componentDidMount () {
+		const { userUpdate } = this.props
+
 		this.loadBestPlayers()
 		this.loadPromo()
 		document.body.style.overflow = 'auto'
+
+		socket.on('user/data', (data) => {
+			userUpdate({ words: data.words })
+		})
+		socket.emit('user/get_data')
 	}
 
 	componentWillUnmount () {
+		socket.removeAllListeners('user/data')
 		if (this.addScript) {
 			this.addScript.outerHTML = ''
 		}
@@ -115,7 +123,7 @@ export class Main extends Component {
 
 	render () {
 		const { types, words } = this.state
-		const { players, user, storage, storageUpdate, popup } = this.props
+		const { players, user, storage, storageUpdate } = this.props
 
 		return (
 			<Panel id="main">
@@ -132,7 +140,7 @@ export class Main extends Component {
 								 weight="bold">
 						<span className="text-truncate">{user.first_name}</span>
 						<CountUp start={words}
-										 style={{ marginLeft: '10px' }}
+										 style={{ marginLeft: 10 }}
 										 end={user.words} />
 					</Title>
 				</Div>
@@ -210,7 +218,10 @@ class User extends Component {
 				<div style={{ display: 'flex', alignItems: 'center' }}>
 					<span className="text-truncate"
 								style={{ marginRight: '4px', maxWidth: '250px' }}>
-						{name}
+						<span style={{ fontWeight: 'bold', width: '26px', display: 'inline-block' }}>
+							{index + 1 < 10 ? '0' : null}{index + 1}
+						</span>
+						<span>{name}</span>
 					</span>
 				</div>
 			</SimpleCell>

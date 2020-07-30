@@ -37,7 +37,7 @@ export default class GridCell {
     this.bgColor = color
     anime({
       targets: cell,
-      colorOpacity: 255,
+      colorOpacity: 150,
       duration: 800,
       ...options
     })

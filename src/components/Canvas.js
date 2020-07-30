@@ -31,7 +31,7 @@ export default class Canvas extends Component {
     socket.on('game/word/open', ({ word, color }) => {
       this.openWord(word, color)
       this.writingWord.close('up')
-      props.findWord()
+      props.findWord(word)
     })
     socket.on('game/word/reopen', ({ word, color }) => {
       this.openWord(word, color)
@@ -165,10 +165,8 @@ export default class Canvas extends Component {
     if (chars) {
       this.writingWord.setWord(chars, sketch.textWidth(chars))
     }
-    let { x, vX, y, vY, width, height, color, opacity, vOpacity, word } = this.writingWord
+    let { x, y, width, height, color, opacity, vOpacity, word } = this.writingWord
     const rectColor = sketch.color(color)
-    x += (vX - x) * 0.2
-    y += (vY - y) * 0.2
     opacity += (vOpacity - opacity) * 0.2
     rectColor.setAlpha(opacity)
     sketch.fill(rectColor)
@@ -236,7 +234,7 @@ export default class Canvas extends Component {
   generateWritingWord () {
     const { game } = this.props
     const x = this.width / 2
-    const y = this.height - ((this.width / 5) * 3.3)
+    const y = this.height - ((this.width / 5) * 3)
     this.writingWord = new WritingWord(x, y, game.color)
   }
   getCharPosition (i) {

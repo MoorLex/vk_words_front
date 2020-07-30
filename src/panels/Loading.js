@@ -46,8 +46,7 @@ export class Loading extends Component {
 		})
 		socket.on('core/ready', async (data) => {
 			userUpdate({
-				words: data.words,
-				socket: data.socket,
+				...data,
 				connected: true
 			})
 			storageUpdate({ connected: true })
@@ -61,20 +60,19 @@ export class Loading extends Component {
 		})
 
 		socket.on('game/start', (data) => {
-			setGame(data)
+			setGame(data.game)
 			closePopup()
 			navigate('game')
 			storageUpdate({
 				extraWords: [],
-				refreshing: false
+				refreshing: false,
+				opponent: data.opponent
 			})
 			if (window.location.href.split('#')[0]) {
-				storageUpdate({ opponent: window.location.href.split('#')[1] })
 				window.history.pushState("", document.title, window.location.href.split('#')[0]);
 			}
 		})
 		socket.on('game/finish', (data) => {
-			userUpdate({ words: data.words })
 			storageUpdate({ hasWords: false })
 			openPopup(
 				<Alert onClose={() => {
@@ -103,7 +101,7 @@ export class Loading extends Component {
 			}
 			storageUpdate({ activeModal: null, opponent: undefined })
 			if (data.code === 403) {
-				navigate('error_403')
+				setTimeout(() => navigate('error_403'), 800)
 			}
 			if (data.code === 404) {
 				navigate('main')

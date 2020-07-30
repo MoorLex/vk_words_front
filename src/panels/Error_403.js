@@ -8,14 +8,16 @@ import IconDoNotDisturbOutline from '@vkontakte/icons/dist/56/do_not_disturb_out
 
 export default class Error_403 extends Component {
 
-	render () {
-		const { navigate } = this.props
+	reconnect () {
+		window.location.reload()
+	}
 
+	render () {
 		return (
 			<Panel id="error_403">
 				<Placeholder icon={<IconDoNotDisturbOutline />}
 										 header="Ошибка"
-										 action={<Button size="l" onClick={() => navigate('loading')}>Попробовать снова</Button>}
+										 action={<Button size="l" onClick={() => this.reconnect()}>Попробовать снова</Button>}
 										 stretched>
 					Ошибка авторизации
 				</Placeholder>
