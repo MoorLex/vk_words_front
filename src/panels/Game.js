@@ -228,7 +228,7 @@ export class Game extends Component {
 								size={20}/>
 				<Subhead weight="bold"
 								 style={{ marginLeft: 7, marginRight: 7, color: '#fff' }}>
-					{points[data.user_id] || 0} / {game.words.length}
+					{points[data.user_id] || 0} / {game.words_count}
 				</Subhead>
 			</div>
 		)
