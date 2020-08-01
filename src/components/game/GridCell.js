@@ -1,8 +1,8 @@
 import anime from 'animejs'
 
 export default class GridCell {
-  constructor (char, x, y, size) {
-    this.char = char
+  constructor (x, y, size) {
+    this.char = ''
     this.bgColor = undefined
     this.colorOpacity = 0
     this.border = 6
@@ -21,8 +21,9 @@ export default class GridCell {
     this.y = (offset.y + this.y) * (this.size + this.border) + (this.border / 2) + y
   }
 
-  open (options) {
+  open (char, options) {
     const cell = this
+    this.char = char
     this.isOpen = true
     anime({
       targets: cell,

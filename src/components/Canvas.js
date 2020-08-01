@@ -218,31 +218,23 @@ export default class Canvas extends Component {
 
   getGridOffset () {
     const { game } = this.props
-    game.grid.forEach((row, y) => {
-      row.forEach((cell, x) => {
-        if (cell) {
-          if (x + 1 > this.gridOffset.x) {
-            this.gridOffset.x = x + 1
-          }
-          if (y + 1 > this.gridOffset.y) {
-            this.gridOffset.y = y + 1
-          }
-        }
-      })
+    game.grid.forEach((cell) => {
+      if (cell[0] + 1 > this.gridOffset.x) {
+        this.gridOffset.x = cell[0] + 1
+      }
+      if (cell[1] + 1 > this.gridOffset.y) {
+        this.gridOffset.y = cell[1] + 1
+      }
     })
     this.gridOffset.x = (game.grid_size - this.gridOffset.x) / 2
     this.gridOffset.y = (game.grid_size - this.gridOffset.y) / 2
   }
   generateGrid () {
     const { game } = this.props
-    game.grid.forEach((row, y) => {
-      row.forEach((cell, x) => {
-        if (cell) {
-          const item = new GridCell(cell, x, y, (this.width - 40) / game.grid_size)
-          item.setOffset(this.gridOffset, 20, 20)
-          this.grid.push(item)
-        }
-      })
+    game.grid.forEach((cell) => {
+      const item = new GridCell(cell[0], cell[1], (this.width - 40) / game.grid_size)
+      item.setOffset(this.gridOffset, 20, 20)
+      this.grid.push(item)
     })
   }
   generateWritingWord () {
@@ -351,7 +343,7 @@ export default class Canvas extends Component {
     } else {
       this.makeGridLine(word.vertical, chars, color)
       chars.forEach((char, i) => {
-        char.open({ delay: i * 100 })
+        char.open(word.word[i], { delay: i * 100 })
       })
     }
   }
