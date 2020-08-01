@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Sketch from 'react-p5'
+import bridge from '@vkontakte/vk-bridge'
 
 import CharBtn from './game/CharBtn'
 import GridCell from './game/GridCell'
@@ -28,9 +29,22 @@ export default class Canvas extends Component {
   constructor(props) {
     super(props)
 
+    bridge.subscribe(({ detail: { type, data }}) => {
+      if (type === 'VKWebAppViewRestore') {
+        this.grid.forEach((cell) => {
+          cell.reset()
+        })
+        this.selected.forEach((char) => {
+          char.release()
+        })
+        this.selected = []
+        this.current = undefined
+      }
+    })
+
     socket.on('game/word/open', ({ word, color }) => {
       this.openWord(word, color)
-      this.writingWord.close('up')
+      this.writingWord.close()
       props.findWord(word)
     })
     socket.on('game/word/reopen', ({ word, color }) => {

@@ -31,7 +31,7 @@ export class Game extends Component {
 	}
 
 	componentDidMount () {
-		const { storageUpdate, closeModal } = this.props
+		const { storageUpdate, closeModal, storage } = this.props
 		document.body.style.overflow = 'hidden'
 		storageUpdate({ extraWords: [], hasWords: false })
 
@@ -49,7 +49,9 @@ export class Game extends Component {
 			setTimeout(() => this.onUserJoined(opponent.user_name), 500)
 		})
 		socket.on('opponent/disconnected', () => {
-			storageUpdate({ opponent: undefined })
+			if (!storage.hasWords) {
+				storageUpdate({ opponent: undefined })
+			}
 			this.onUserDisconnect()
 		})
 	}
@@ -117,9 +119,11 @@ export class Game extends Component {
 		storageUpdate({ hasWords: true })
 
 		if (points[word.isOpen]) {
-			this.setState({ points: { [word.isOpen]: points[word.isOpen] + 1 } })
+			points[word.isOpen]++
+			this.setState({ points })
 		} else {
-			this.setState({ points: { [word.isOpen]: 1 } })
+			points[word.isOpen] = 1
+			this.setState({ points })
 		}
 	}
 
@@ -134,8 +138,6 @@ export class Game extends Component {
 			foregroundColor,
 			isShowLogo: true
 		});
-
-		console.log(link)
 
 		const buff = new Buffer(qrSvg);
 		const qr = buff.toString('base64');

@@ -79,7 +79,7 @@ function modals(state = INITIAL_MODALS, action){
     case MODALS_WORDS:
       return { active: 'modal-words', data: action.payload.data }
     case MODALS_CLOSE:
-      return { active: null, data: undefined }
+      return { active: null, data: state.data }
     default:
       return state
   }

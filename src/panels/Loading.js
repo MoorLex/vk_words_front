@@ -41,9 +41,6 @@ export class Loading extends Component {
 
 		// document.body.setAttribute('scheme', 'space_gray');
 
-		socket.on('connect', () => {
-			console.log('Connected!')
-		})
 		socket.on('core/ready', async (data) => {
 			userUpdate({
 				...data,
@@ -113,11 +110,20 @@ export class Loading extends Component {
 				navigate('main')
 			}
 		})
-		socket.on('disconnect', () => {
-			navigate('error_disconnect')
-			closePopup()
-			closeModal()
-		})
+
+		socket.on('error', () => this.onError())
+		socket.on('disconnect', () => this.onError())
+		socket.on('connect_error', () => this.onError())
+		socket.on('reconnect_error', () => this.onError())
+		socket.on('reconnect_failed', () => this.onError())
+	}
+
+	onError () {
+		const { navigate, closePopup, closeModal } = this.props
+
+		navigate('error_disconnect')
+		closePopup()
+		closeModal()
 	}
 
 	render () {
