@@ -13,6 +13,16 @@ import Error403 from './panels/Error_403'
 import Launch from './panels/Launch'
 import ErrorDisconnect from './panels/Error_Disconnect'
 
+
+const routes = [
+	'game',
+	'main',
+	'loading',
+	'launch',
+	'error_403',
+	'error_disconnect'
+]
+
 export class App extends Component{
 	constructor(props) {
 		super(props)
@@ -24,7 +34,7 @@ export class App extends Component{
 	}
 
 	componentDidMount() {
-		const { storageUpdate } = this.props
+		const { storageUpdate, closeModal, closePopup } = this.props
 		bridge.send("VKWebAppInit").then(() => {})
 		bridge.subscribe(({ detail: { type, data }}) => {
 			if (type === 'VKWebAppUpdateConfig') {
@@ -41,11 +51,33 @@ export class App extends Component{
 			if (type === 'VKWebAppViewRestore') { onBlur() }
 		})
 
+		window.addEventListener("hashchange", ({ oldURL }) => {
+			const { modals } = this.props
+			const hash = window.location.hash.slice(1)
+			if (routes.includes(hash) || hash === '') {
+				this.setState({
+					activePanel: hash || 'main'
+				})
+				closePopup()
+			}
+
+			if (oldURL.split('#')[1] === 'modal' && modals.timestamp + 500 <= Date.now()) {
+				closeModal()
+			} else if (oldURL.split('#')[1] === 'modal') {
+				window.location.hash = 'modal'
+			}
+
+		}, false);
+
 		// document.body.setAttribute('scheme', 'space_gray');
 	}
 
-	navigate = (activePanel) => {
-		this.setState({ activePanel })
+	navigate = (activePanel, force = false) => {
+		if (!force) {
+			window.location.hash = activePanel;
+		} else {
+			this.setState({ activePanel })
+		}
 	}
 
 	render () {
@@ -74,8 +106,8 @@ export class App extends Component{
 }
 
 const mapStateToProps = (state) => {
-	const { user, storage, popup } = state
-	return { user, storage, popup }
+	const { user, storage, popup, modals } = state
+	return { user, storage, popup, modals }
 }
 export default connect(mapStateToProps, actions)(App)
 

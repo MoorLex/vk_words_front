@@ -68,18 +68,19 @@ function user(state = INITIAL_USER, action){
 
 const INITIAL_MODALS = {
   active: null,
+  timestamp: 0,
   data: undefined,
 }
 function modals(state = INITIAL_MODALS, action){
   switch (action.type) {
     case MODALS_USER:
-      return { active: 'modal-user', data: action.payload.data }
+      return { active: 'modal-user', data: action.payload.data, timestamp: Date.now() }
     case MODALS_INVITE:
-      return { active: 'modal-invite', data: action.payload.data }
+      return { active: 'modal-invite', data: action.payload.data, timestamp: Date.now() }
     case MODALS_WORDS:
-      return { active: 'modal-words', data: action.payload.data }
+      return { active: 'modal-words', data: action.payload.data, timestamp: Date.now() }
     case MODALS_CLOSE:
-      return { active: null, data: state.data }
+      return { active: null, data: state.data, timestamp: 0 }
     default:
       return state
   }
@@ -134,18 +135,21 @@ export const actions = {
     }
   },
   showUserModal(data) {
+    window.location.hash = 'modal'
     return {
       type: MODALS_USER,
       payload: { data }
     }
   },
   showInviteModal(data) {
+    window.location.hash = 'modal'
     return {
       type: MODALS_INVITE,
       payload: { data }
     }
   },
   showWordsModal(data) {
+    window.location.hash = 'modal'
     return {
       type: MODALS_WORDS,
       payload: { data }

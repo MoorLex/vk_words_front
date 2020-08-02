@@ -21,6 +21,9 @@ export class Loading extends Component {
 		closePopup()
 		closeModal()
 
+		const hash = window.location.hash
+		window.history.replaceState("", document.title, window.location.href.split('#')[0]);
+
 		bridge.send("VKWebAppGetUserInfo").then((data) => {
 			userUpdate(data)
 			socket.emit('core/init', { ...data, params: window.location.search.slice(1).split('#')[0] })
@@ -41,10 +44,11 @@ export class Loading extends Component {
 			})
 			storageUpdate({ connected: true })
 			setTimeout(() => {
-				if (window.location.href.split('#')[1]) {
-					socket.emit('core/join', window.location.href.split('#')[1])
+				let regexp =  /(#game\/)[\w]+/gi
+				if (regexp.test(hash)) {
+					socket.emit('core/join', hash.split('/')[1])
 				} else {
-					navigate(data.new ? 'launch' : 'main')
+					navigate(data.new ? 'launch' : 'main', true)
 				}
 			}, 500)
 		})
@@ -58,16 +62,13 @@ export class Loading extends Component {
 				refreshing: false,
 				opponent: data.opponent
 			})
-			if (window.location.href.split('#')[0]) {
-				window.history.pushState("", document.title, window.location.href.split('#')[0]);
-			}
 		})
 		socket.on('game/finish', (data) => {
 			storageUpdate({ hasWords: false })
 			openPopup(
 				<Alert onClose={() => {
 					closePopup()
-					navigate('main')
+					window.history.back()
 				}}
 							 actions={[{
 								 title: 'Сыграть еще',
@@ -86,9 +87,6 @@ export class Loading extends Component {
 			console.warn(data)
 			closePopup()
 			closeModal()
-			if (window.location.href.split('#')[0]) {
-				window.history.pushState("", document.title, window.location.href.split('#')[0]);
-			}
 			storageUpdate({ activeModal: null, opponent: undefined })
 			if (data.code === 403) {
 				setTimeout(() => navigate('error_403'), 800)

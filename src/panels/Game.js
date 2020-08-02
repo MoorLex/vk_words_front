@@ -129,7 +129,7 @@ export class Game extends Component {
 
 	invite () {
 		const { showInviteModal, user, storage } = this.props
-		const link = 'https://vk.com/app7500339/#' + user.socket
+		const link = 'https://vk.com/app7500339/#game/' + user.socket
 		const foregroundColor = storage.theme === 'light' ? '#aeb7c2' : '#5d5f61'
 		const qrSvg = vkQr.createQR(link, {
 			ecc: 2,
@@ -146,9 +146,8 @@ export class Game extends Component {
 	}
 
 	close () {
-		const { navigate } = this.props
 		socket.emit('core/reset')
-		navigate("main")
+		window.history.back()
 	}
 
 	BtnRandomize () {

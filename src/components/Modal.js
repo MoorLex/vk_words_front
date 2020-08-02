@@ -21,8 +21,15 @@ import { actions } from '../store'
 
 export class Modals extends Component {
 
+  close () {
+    const { modals } = this.props
+    if (modals.timestamp + 500 <= Date.now()) {
+      window.history.back()
+    }
+  }
+
   ModalInvite () {
-    const { modals, closeModal } = this.props
+    const { modals } = this.props
     const { qr, link } = modals.data || {}
     const actions = []
 
@@ -38,7 +45,7 @@ export class Modals extends Component {
 
     return (
       <ModalCard id="modal-invite"
-                 onClose={() => closeModal()}
+                 onClose={() => this.close()}
                  icon={<Avatar size={200}
                                mode="image"
                                shadow={false}
@@ -52,14 +59,14 @@ export class Modals extends Component {
   }
 
   ModalWords () {
-    const {  modals, closeModal } = this.props
+    const {  modals } = this.props
     const extraWords = modals.data || []
 
     return (
       <ModalPage id="modal-words"
-                 onClose={() => closeModal()}
+                 onClose={() => this.close()}
                  header={
-                   <ModalPageHeader right={<PanelHeaderButton onClick={() => closeModal()}><IconDismiss /></PanelHeaderButton>}>
+                   <ModalPageHeader right={<PanelHeaderButton onClick={() => this.close()}><IconDismiss /></PanelHeaderButton>}>
                      Дополнительные слова
                    </ModalPageHeader>
                  }>
@@ -80,12 +87,12 @@ export class Modals extends Component {
   }
 
   ModalUser () {
-    const { modals, closeModal } = this.props
+    const { modals } = this.props
     const { user_name, user_avatar, user_country, words, games_count, games_finished } = modals.data || {}
 
     return (
       <ModalCard id="modal-user"
-                 onClose={() => closeModal()}
+                 onClose={() => this.close()}
                  actionsLayout="vertical">
         <SimpleCell
           style={{ pointerEvents: 'none' }}
