@@ -18,6 +18,7 @@ import {
 	ScreenSpinner
 } from '@vkontakte/vkui'
 import { api } from '../api'
+import { resetGame } from '../game'
 import bridge from '@vkontakte/vk-bridge'
 import IconFire from '@vkontakte/icons/dist/12/fire'
 import { actions } from '../store'
@@ -106,11 +107,13 @@ export class Main extends Component {
 
 		this.loadBestPlayers()
 		this.loadPromo()
+		resetGame()
 		document.body.style.overflow = 'auto'
 
 		socket.on('user/data', (data) => {
 			userUpdate({ words: data.words })
 		})
+		socket.emit('core/reset')
 		socket.emit('user/get_data')
 	}
 

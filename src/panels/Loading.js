@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import bridge from '@vkontakte/vk-bridge'
 import {
-	Alert,
 	Panel,
 	Placeholder,
 	Spinner
@@ -10,13 +9,11 @@ import {
 import { socket } from '../server'
 import { actions } from '../store'
 import { setGame } from '../game'
-import IconFavoriteOutline from '@vkontakte/icons/dist/56/favorite_outline'
-import IconUsersOutline from '@vkontakte/icons/dist/56/users_outline'
 
 export class Loading extends Component {
 
 	componentDidMount () {
-		const { storageUpdate, userUpdate, navigate, closePopup, closeModal, openPopup } = this.props
+		const { storageUpdate, userUpdate, navigate, closePopup, closeModal } = this.props
 
 		closePopup()
 		closeModal()
@@ -63,25 +60,6 @@ export class Loading extends Component {
 				opponent: data.opponent
 			})
 		})
-		socket.on('game/finish', (data) => {
-			storageUpdate({ hasWords: false })
-			openPopup(
-				<Alert onClose={() => {
-					closePopup()
-					window.history.back()
-				}}
-							 actions={[{
-								 title: 'Сыграть еще',
-								 action: () => this.reloadGame()
-							 }]} >
-					<div style={{ display: 'flex', justifyContent: 'center' }}>
-						{data.win ? (<IconFavoriteOutline />) : (<IconUsersOutline />)}
-					</div>
-					<h2>{data.win ? 'Вы нашли все слова!' : 'Ваш противник выйграл!'}</h2>
-					<p>Хотите повторить игру?</p>
-				</Alert>
-			)
-		})
 
 		socket.on('core/error', (data) => {
 			console.warn(data)
@@ -107,12 +85,6 @@ export class Loading extends Component {
 		socket.on('connect_error', () => this.onError())
 		socket.on('reconnect_error', () => this.onError())
 		socket.on('reconnect_failed', () => this.onError())
-	}
-
-	async reloadGame () {
-		const { storageUpdate } = this.props
-		storageUpdate({ refreshing: true, opponent: undefined })
-		socket.emit('core/restart')
 	}
 
 	onError () {

@@ -6,12 +6,15 @@ import {
 	PanelHeaderBack,
 	Avatar,
 	Subhead,
-	Snackbar
+	Snackbar,
+	Alert
 } from '@vkontakte/vkui'
 import vkQr from '@vkontakte/vk-qr';
 import IconRefreshOutline from '@vkontakte/icons/dist/28/refresh_outline'
 import IconWaterDropOutline from '@vkontakte/icons/dist/28/water_drop_outline'
 import IconUserAddOutline from '@vkontakte/icons/dist/28/user_add_outline'
+import IconFavoriteOutline from '@vkontakte/icons/dist/56/favorite_outline'
+import IconUsersOutline from '@vkontakte/icons/dist/56/users_outline'
 import IconUser from '@vkontakte/icons/dist/24/user'
 import Canvas from '../components/Canvas'
 import { game } from '../game'
@@ -31,12 +34,20 @@ export class Game extends Component {
 	}
 
 	componentDidMount () {
-		const { storageUpdate, closeModal, storage } = this.props
+		const { storageUpdate, closeModal, closePopup, openPopup } = this.props
 		document.body.style.overflow = 'hidden'
 		storageUpdate({ extraWords: [], hasWords: false })
 
 		window.addEventListener('blur', () => onBlur());
 
+		socket.on('opponent/disconnected', () => {
+			const { storage } = this.props
+			if (!storage.opponent) return null
+			if (!storage.hasWords) {
+				storageUpdate({ opponent: undefined })
+			}
+			this.onUserDisconnect()
+		})
 		socket.on('game/pints', (points) => {
 			this.setState({ points })
 		})
@@ -48,19 +59,40 @@ export class Game extends Component {
 			storageUpdate({ opponent })
 			setTimeout(() => this.onUserJoined(opponent.user_name), 500)
 		})
-		socket.on('opponent/disconnected', () => {
-			if (!storage.hasWords) {
-				storageUpdate({ opponent: undefined })
-			}
-			this.onUserDisconnect()
+		socket.on('game/finish', (data) => {
+			storageUpdate({ hasWords: false })
+			openPopup(
+				<Alert onClose={() => {
+					closePopup()
+					window.history.back()
+				}}
+							 actions={[{
+								 title: 'Сыграть еще',
+								 action: () => this.reloadGame()
+							 }]} >
+					<div style={{ display: 'flex', justifyContent: 'center' }}>
+						{data.win ? (<IconFavoriteOutline />) : (<IconUsersOutline />)}
+					</div>
+					<h2>{data.win ? 'Вы нашли все слова!' : 'Ваш противник выйграл!'}</h2>
+					<p>Хотите повторить игру?</p>
+				</Alert>
+			)
 		})
 	}
 
 	componentWillUnmount () {
 		document.body.style.overflow = 'auto'
 		window.removeEventListener('blur', () => onBlur());
+		socket.removeAllListeners('game/finish')
 		socket.removeAllListeners('opponent/joined')
 		socket.removeAllListeners('opponent/disconnected')
+	}
+
+	async reloadGame () {
+		const { storageUpdate } = this.props
+		this.setState({ points: {} })
+		storageUpdate({ refreshing: true, opponent: undefined })
+		socket.emit('core/restart')
 	}
 
 	onUserJoined (name) {
@@ -146,8 +178,9 @@ export class Game extends Component {
 	}
 
 	close () {
+		const { navigate } = this.props
 		socket.emit('core/reset')
-		window.history.back()
+		navigate('main')
 	}
 
 	BtnRandomize () {
@@ -207,7 +240,7 @@ export class Game extends Component {
 		const style = { ...styles.btn, ...styles.label, bottom: '25%' }
 		let data = {}
 
-		if (!storage.opponent) return null
+		if (!storage.opponent || !game) return null
 
 		if (type === 'user') {
 			style.left = 20
@@ -242,7 +275,7 @@ export class Game extends Component {
 				<PanelHeader left={<PanelHeaderBack onClick={() => this.close()} />}>
 					Игра
 				</PanelHeader>
-				{!storage.refreshing ? (
+				{!storage.refreshing && game ? (
 					<Canvas ref={(ref) => this.canvas = ref}
 									game={game}
 									stop={modals.active || popup || storage.isBlur}

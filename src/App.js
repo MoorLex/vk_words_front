@@ -12,7 +12,7 @@ import Loading from './panels/Loading'
 import Error403 from './panels/Error_403'
 import Launch from './panels/Launch'
 import ErrorDisconnect from './panels/Error_Disconnect'
-
+import {game} from "./game";
 
 const routes = [
 	'game',
@@ -53,7 +53,11 @@ export class App extends Component{
 
 		window.addEventListener("hashchange", ({ oldURL }) => {
 			const { modals } = this.props
-			const hash = window.location.hash.slice(1)
+			let hash = window.location.hash.slice(1)
+			if (hash === 'game' && !game) {
+				hash = ''
+				window.history.replaceState("", document.title, window.location.href.split('#')[0]);
+			}
 			if (routes.includes(hash) || hash === '') {
 				this.setState({
 					activePanel: hash || 'main'

@@ -11,3 +11,7 @@ export function setGame (data) {
   params.chars = params.chars.split(',')
   game = params
 }
+
+export function resetGame () {
+  game = undefined
+}
