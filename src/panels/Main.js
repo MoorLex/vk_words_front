@@ -38,8 +38,8 @@ export class Main extends Component {
 					id: 1,
 					name: 'Для начала',
 					text: 'найдите всего 5 слов',
-					color: '#665195',
-					image: 'banner-1.png',
+					color: '#4a9efb',
+					image: 'banner-1.svg',
 					words: 5,
 					wordsLength: 4
 				},
@@ -48,7 +48,7 @@ export class Main extends Component {
 					name: 'Довольно просто',
 					text: 'отгадать 7 слов',
 					color: '#65c063',
-					image: 'banner-2.png',
+					image: 'banner-2.svg',
 					words: 7,
 					wordsLength: 5
 				},
@@ -56,8 +56,8 @@ export class Main extends Component {
 					id: 3,
 					name: 'Ух, как сложно',
 					text: 'найти 13 слов',
-					color: '#f27c59',
-					image: 'banner-3.png',
+					color: '#665195',
+					image: 'banner-3.svg',
 					words: 13,
 					wordsLength: 6
 				},
@@ -65,8 +65,8 @@ export class Main extends Component {
 					id: 4,
 					name: 'Невозможно',
 					text: 'открыть 17 слов',
-					color: '#4a9efb',
-					image: 'banner-4.png',
+					color: '#ed174a',
+					image: 'banner-4.svg',
 					words: 17,
 					wordsLength: 7
 				}
@@ -193,7 +193,13 @@ export class Main extends Component {
 						</FlipMove>
 					</Group>
 				) : null}
-				<Footer>By Moorlex</Footer>
+				<Footer>
+					<a href="https://vk.com/moorlex"
+						 target="_blank"
+						 style={{ textDecoration: 'none' }}>
+						<Button stretched mode="tertiary">By Moorlex</Button>
+					</a>
+				</Footer>
 			</Panel>
 		)
 	}

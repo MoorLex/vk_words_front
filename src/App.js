@@ -12,6 +12,7 @@ import Loading from './panels/Loading'
 import Error403 from './panels/Error_403'
 import Launch from './panels/Launch'
 import ErrorDisconnect from './panels/Error_Disconnect'
+import ErrorTimeLimit from './panels/Error_TimeLimit'
 import {game} from "./game";
 
 const routes = [
@@ -52,18 +53,20 @@ export class App extends Component{
 		})
 
 		window.addEventListener("hashchange", ({ oldURL }) => {
-			const { modals } = this.props
+			const { modals, user } = this.props
 			let hash = window.location.hash.slice(1)
+
 			if (hash === 'game' && !game) {
 				hash = ''
 				window.history.replaceState("", document.title, window.location.href.split('#')[0]);
 			}
-			if (routes.includes(hash) || hash === '') {
+			if (user.socket && (routes.includes(hash) || hash === '')) {
 				this.setState({
 					activePanel: hash || 'main'
 				})
-				closePopup()
 			}
+
+			closePopup()
 
 			if (oldURL.split('#')[1] === 'modal' && modals.timestamp + 500 <= Date.now()) {
 				closeModal()
@@ -104,6 +107,7 @@ export class App extends Component{
 									navigate={this.navigate} />
 				<ErrorDisconnect id="error_disconnect"
 												 navigate={this.navigate} />
+				<ErrorTimeLimit id="error_timeLimit" />
 			</View>
 		)
 	}

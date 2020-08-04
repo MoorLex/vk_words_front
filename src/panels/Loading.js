@@ -8,9 +8,10 @@ import {
 } from '@vkontakte/vkui'
 import { socket } from '../server'
 import { actions } from '../store'
-import { setGame } from '../game'
+import { setGame, resetGame } from '../game'
 
 export class Loading extends Component {
+	timer
 
 	componentDidMount () {
 		const { storageUpdate, userUpdate, navigate, closePopup, closeModal } = this.props
@@ -19,7 +20,7 @@ export class Loading extends Component {
 		closeModal()
 
 		const hash = window.location.hash
-		window.history.replaceState("", document.title, window.location.href.split('#')[0]);
+		window.history.replaceState("", document.title, window.location.href.split('#')[0])
 
 		bridge.send("VKWebAppGetUserInfo").then((data) => {
 			userUpdate(data)
@@ -36,8 +37,7 @@ export class Loading extends Component {
 
 		socket.on('core/ready', async (data) => {
 			userUpdate({
-				...data,
-				connected: true
+				...data
 			})
 			storageUpdate({ connected: true })
 			setTimeout(() => {
@@ -65,18 +65,19 @@ export class Loading extends Component {
 			console.warn(data)
 			closePopup()
 			closeModal()
+			resetGame()
 			storageUpdate({ activeModal: null, opponent: undefined })
 			if (data.code === 403) {
-				setTimeout(() => navigate('error_403'), 800)
+				setTimeout(() => navigate('error_403', true), 800)
 			}
 			if (data.code === 404) {
-				navigate('main')
+				navigate('main', true)
 			}
 			if (data.code === 405) {
-				navigate('main')
+				navigate('main', true)
 			}
 			if (data.code === 422) {
-				navigate('main')
+				navigate('main', true)
 			}
 		})
 
@@ -85,12 +86,25 @@ export class Loading extends Component {
 		socket.on('connect_error', () => this.onError())
 		socket.on('reconnect_error', () => this.onError())
 		socket.on('reconnect_failed', () => this.onError())
+
+		this.timer = setTimeout(() => this.handleTimer(), 4200)
+	}
+
+	componentWillUnmount() {
+		clearTimeout(this.timer)
+	}
+
+	handleTimer () {
+		const { navigate } = this.props
+		navigate('error_timeLimit', true)
 	}
 
 	onError () {
-		const { navigate, closePopup, closeModal } = this.props
+		const { navigate, closePopup, closeModal, userUpdate } = this.props
 
-		navigate('error_disconnect')
+		userUpdate({ socket: undefined })
+		navigate('error_disconnect', true)
+		resetGame()
 		closePopup()
 		closeModal()
 	}

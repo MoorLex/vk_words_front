@@ -179,7 +179,11 @@ export default class Canvas extends Component {
     if (chars) {
       this.writingWord.setWord(chars, sketch.textWidth(chars))
     }
+
     let { x, y, width, height, color, opacity, vOpacity, word } = this.writingWord
+
+    if (!word) return
+
     const rectColor = sketch.color(color)
     opacity += (vOpacity - opacity) * 0.2
     rectColor.setAlpha(opacity)
@@ -339,7 +343,7 @@ export default class Canvas extends Component {
         chars.forEach((char, i) => {
           char.reset({ delay: i * 100 })
         })
-      }, 500)
+      }, chars.length * 100)
     } else {
       this.makeGridLine(word.vertical, chars, color)
       chars.forEach((char, i) => {
