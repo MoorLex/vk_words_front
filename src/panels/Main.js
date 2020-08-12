@@ -194,10 +194,11 @@ export class Main extends Component {
 					</Group>
 				) : null}
 				<Footer>
-					<a href="https://vk.com/moorlex"
+					<a href="https://vk.com/cute_lab"
 						 target="_blank"
+						 rel="noopener noreferrer"
 						 style={{ textDecoration: 'none' }}>
-						<Button stretched mode="tertiary">By Moorlex</Button>
+						<Button stretched mode="tertiary">By Cute Lab</Button>
 					</a>
 				</Footer>
 			</Panel>

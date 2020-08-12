@@ -86,17 +86,10 @@ export class Loading extends Component {
 		socket.on('connect_error', () => this.onError())
 		socket.on('reconnect_error', () => this.onError())
 		socket.on('reconnect_failed', () => this.onError())
-
-		this.timer = setTimeout(() => this.handleTimer(), 4200)
 	}
 
 	componentWillUnmount() {
 		clearTimeout(this.timer)
-	}
-
-	handleTimer () {
-		const { navigate } = this.props
-		navigate('error_timeLimit', true)
 	}
 
 	onError () {

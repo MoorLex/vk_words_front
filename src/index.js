@@ -1,5 +1,6 @@
 import 'core-js/features/map'
 import 'core-js/features/set'
+import 'moment/locale/ru';
 import registerServiceWorker from './sw'
 import React from 'react'
 import ReactDOM from 'react-dom'

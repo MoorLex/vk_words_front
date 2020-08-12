@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { platform } from '../utils'
+import moment from 'moment'
 import bridge from '@vkontakte/vk-bridge'
 import {
   ModalRoot,
@@ -88,7 +89,7 @@ export class Modals extends Component {
 
   ModalUser () {
     const { modals } = this.props
-    const { user_name, user_avatar, user_country, words, games_count, games_finished } = modals.data || {}
+    const { user_name, user_avatar, user_country, words, total_games, finished_games, created_at } = modals.data || {}
 
     return (
       <ModalCard id="modal-user"
@@ -102,17 +103,24 @@ export class Modals extends Component {
           {user_name}
         </SimpleCell>
         <Group style={{ pointerEvents: 'none' }}>
-          {user_country ? (
-            <SimpleCell>
-              <InfoRow header="Страна">{user_country}</InfoRow>
+          <div style={{ display: 'flex' }}>
+            <SimpleCell style={{ flex: 1 }}>
+              <InfoRow header="Дата регистрации">{moment(created_at).calendar()}</InfoRow>
             </SimpleCell>
-          ) : null}
-          <SimpleCell>
-            <InfoRow header="Созданных игр">{games_count}</InfoRow>
-          </SimpleCell>
-          <SimpleCell>
-            <InfoRow header="Выигранных игр">{games_finished}</InfoRow>
-          </SimpleCell>
+            {user_country ? (
+              <SimpleCell style={{ flex: 1 }}>
+                <InfoRow header="Страна">{user_country}</InfoRow>
+              </SimpleCell>
+            ) : null}
+          </div>
+          <div style={{ display: 'flex' }}>
+            <SimpleCell style={{ flex: 1 }}>
+              <InfoRow header="Созданных игр">{total_games}</InfoRow>
+            </SimpleCell>
+            <SimpleCell style={{ flex: 1 }}>
+              <InfoRow header="Выигранных игр">{finished_games}</InfoRow>
+            </SimpleCell>
+          </div>
         </Group>
       </ModalCard>
     )

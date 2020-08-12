@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import {
 	Panel,
-	Placeholder,
-	Button
+	Placeholder
 } from '@vkontakte/vkui'
 import IconDoNotDisturbOutline from '@vkontakte/icons/dist/56/do_not_disturb_outline'
 
