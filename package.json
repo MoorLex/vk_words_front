@@ -28,7 +28,7 @@
     "@vkontakte/vk-qr": "^2.0.10",
     "@vkontakte/vkui": "^3.11.2",
     "animejs": "^3.2.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "babel-eslint": "^10.1.0",
     "chalk": "^4.1.0",
     "core-js": "^3.6.5",
